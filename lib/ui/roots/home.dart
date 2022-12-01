@@ -1,4 +1,4 @@
-import 'package:digdes_ui/data/auth_service.dart';
+import 'package:digdes_ui/data/services/auth_service.dart';
 import 'package:digdes_ui/ui/app_navigator.dart';
 import 'package:flutter/material.dart';
 

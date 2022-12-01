@@ -1,4 +1,4 @@
-import 'package:digdes_ui/data/auth_service.dart';
+import 'package:digdes_ui/data/services/auth_service.dart';
 import 'package:digdes_ui/ui/app_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,17 +7,25 @@ class _ViewModelState {
   final String? login;
   final String? password;
   final bool isLoading;
-  _ViewModelState({this.login, this.password, this.isLoading = false});
+  final String? errorText;
+  _ViewModelState({
+    this.login,
+    this.password,
+    this.isLoading = false,
+    this.errorText,
+  });
 
   _ViewModelState copyWith({
     String? login,
     String? password,
     bool? isLoading = false,
+    String? errorText,
   }) {
     return _ViewModelState(
       login: login ?? this.login,
       password: password ?? this.password,
       isLoading: isLoading ?? this.isLoading,
+      errorText: errorText ?? this.errorText,
     );
   }
 }
@@ -50,14 +58,19 @@ class _ViewModel extends ChangeNotifier {
         (state.password?.isNotEmpty ?? false);
   }
 
-  login() async {
+  void login() async {
     state = state.copyWith(isLoading: true);
     await Future.delayed(const Duration(seconds: 2))
         .then((value) => {state = state.copyWith(isLoading: false)});
-
-    await _authService
-        .auth(state.login, state.password)
-        .then((value) => AppNavigator.toLoader());
+    try {
+      await _authService
+          .auth(state.login, state.password)
+          .then((value) => AppNavigator.toLoader());
+    } on NoNetworkException {
+      state = state.copyWith(errorText: "No Network");
+    } on WrongCredentialsException {
+      state = state.copyWith(errorText: "Incorrect login or password");
+    }
   }
 }
 
@@ -91,6 +104,8 @@ class Auth extends StatelessWidget {
                   onPressed: viewModel.checkFields() ? viewModel.login : null,
                   child: const Text("Login")),
               if (viewModel.state.isLoading) const CircularProgressIndicator(),
+              if (viewModel.state.errorText != null)
+                Text(viewModel.state.errorText!)
             ]),
           ),
         ),
