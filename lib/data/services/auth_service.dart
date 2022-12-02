@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:digdes_ui/domain/repository/api_repository.dart';
+import 'package:digdes_ui/internal/config/shared_preferences.dart';
 import 'package:digdes_ui/internal/config/token_storage.dart';
 import 'package:digdes_ui/internal/dependencies/repository_module.dart';
 import 'package:dio/dio.dart';
@@ -15,19 +16,35 @@ class AuthService {
 
         if (token != null) {
           await TokenStorage.setStoredToken(token);
+          var user = await _api.getUser();
+          if (user != null) {
+            SharedPrefs.setStoredUser(user);
+          }
         }
       } on DioError catch (e) {
         if (e.error is SocketException) {
           throw NoNetworkException();
-        } else if (<int>[401, 404, 500].contains(e.response?.statusCode)) {
+        } else if (<int>[401].contains(e.response?.statusCode)) {
           throw WrongCredentialsException();
+        } else if (<int>[500].contains(e.response?.statusCode)) {
+          throw ServerException();
         }
       }
     }
   }
 
+  Future<bool> tryGetUser() async {
+    try {
+      await _api.getUser();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<bool> checkAuth() async {
-    return (await TokenStorage.getAccessToken()) != null;
+    return ((await TokenStorage.getAccessToken()) != null) &&
+        (await SharedPrefs.getStoredUser() != null);
   }
 
   Future logOut() async {
@@ -38,3 +55,5 @@ class AuthService {
 class NoNetworkException implements Exception {}
 
 class WrongCredentialsException implements Exception {}
+
+class ServerException implements Exception {}

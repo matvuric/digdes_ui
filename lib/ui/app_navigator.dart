@@ -1,19 +1,19 @@
+import 'package:digdes_ui/ui/roots/app.dart';
 import 'package:digdes_ui/ui/roots/auth.dart';
-import 'package:digdes_ui/ui/roots/home.dart';
 import 'package:digdes_ui/ui/roots/loader.dart';
 import 'package:flutter/material.dart';
 
 class NavigationRoutes {
   static const loader = "/";
   static const auth = "/auth";
-  static const home = "/home";
+  static const app = "/app";
 }
 
 class AppNavigator {
   static final key = GlobalKey<NavigatorState>();
 
-  static void toLoader() {
-    key.currentState?.pushNamedAndRemoveUntil(
+  static Future toLoader() async {
+    return await key.currentState?.pushNamedAndRemoveUntil(
         NavigationRoutes.loader, (((route) => false)));
   }
 
@@ -24,7 +24,7 @@ class AppNavigator {
 
   static void toHome() {
     key.currentState
-        ?.pushNamedAndRemoveUntil(NavigationRoutes.home, (((route) => false)));
+        ?.pushNamedAndRemoveUntil(NavigationRoutes.app, (((route) => false)));
   }
 
   static Route<dynamic>? onGeneratedRoutes(
@@ -36,9 +36,8 @@ class AppNavigator {
       case NavigationRoutes.auth:
         return PageRouteBuilder(pageBuilder: ((_, __, ___) => Auth.create()));
 
-      case NavigationRoutes.home:
-        return PageRouteBuilder(
-            pageBuilder: ((_, __, ___) => const Home(title: "my app")));
+      case NavigationRoutes.app:
+        return PageRouteBuilder(pageBuilder: ((_, __, ___) => App.create()));
     }
     return null;
   }
