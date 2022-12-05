@@ -29,10 +29,6 @@ class _ViewModel extends ChangeNotifier {
     user = await SharedPrefs.getStoredUser();
   }
 
-  void _logOut() async {
-    await _authService.logOut().then((value) => AppNavigator.toLoader());
-  }
-
   void _refresh() async {
     await _authService.tryGetUser();
   }
@@ -44,32 +40,39 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var viewModel = context.watch<_ViewModel>();
+    ImageProvider img;
+
+    if (viewModel.user != null && viewModel.headers != null && viewModel.user!.avatarLink != null) {
+      img = NetworkImage("$baseUrl2 ${viewModel.user!.avatarLink}",
+          headers: viewModel.headers);
+    } else {
+      img = const AssetImage("assets/images/noavatar.png");
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          viewModel.user == null ? "Hi" : viewModel.user!.username,
-        ),
+        title: const Text("NastyGram"),
         actions: [
+          Material(
+            elevation: 8,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            shape: const CircleBorder(),
+            child: InkWell(
+              onTap: () {
+                AppNavigator.toProfile();
+              },
+              child: Ink.image(
+                image: img,
+                height: 30,
+                width: 30,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
           IconButton(
             onPressed: viewModel._refresh,
             icon: const Icon(Icons.refresh_outlined),
           ),
-          IconButton(
-            onPressed: viewModel._logOut,
-            icon: const Icon(Icons.exit_to_app_outlined),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          if (viewModel.user != null && viewModel.headers != null)
-            CircleAvatar(
-              backgroundImage: NetworkImage(
-                  "$baseUrl2 ${viewModel.user!.avatarLink}",
-                  headers: viewModel.headers),
-              radius: 60,
-            ),
         ],
       ),
     );

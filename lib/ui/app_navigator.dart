@@ -1,12 +1,14 @@
 import 'package:digdes_ui/ui/roots/app.dart';
 import 'package:digdes_ui/ui/roots/auth.dart';
 import 'package:digdes_ui/ui/roots/loader.dart';
+import 'package:digdes_ui/ui/roots/profile.dart';
 import 'package:flutter/material.dart';
 
 class NavigationRoutes {
   static const loader = "/";
   static const auth = "/auth";
   static const app = "/app";
+  static const profile = "/profile";
 }
 
 class AppNavigator {
@@ -27,6 +29,10 @@ class AppNavigator {
         ?.pushNamedAndRemoveUntil(NavigationRoutes.app, (((route) => false)));
   }
 
+  static void toProfile() {
+    key.currentState?.pushNamed(NavigationRoutes.profile);
+  }
+
   static Route<dynamic>? onGeneratedRoutes(
       RouteSettings settings, BuildContext context) {
     switch (settings.name) {
@@ -38,6 +44,10 @@ class AppNavigator {
 
       case NavigationRoutes.app:
         return PageRouteBuilder(pageBuilder: ((_, __, ___) => App.create()));
+
+      case NavigationRoutes.profile:
+        return PageRouteBuilder(
+            pageBuilder: ((_, __, ___) => Profile.create()));
     }
     return null;
   }
