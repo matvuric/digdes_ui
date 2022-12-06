@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class _ViewModel extends ChangeNotifier {
+  // TODO : add localization
   BuildContext context;
   final _authService = AuthService();
   _ViewModel({required this.context}) {
@@ -42,7 +43,9 @@ class App extends StatelessWidget {
     var viewModel = context.watch<_ViewModel>();
     ImageProvider img;
 
-    if (viewModel.user != null && viewModel.headers != null && viewModel.user!.avatarLink != null) {
+    if (viewModel.user != null &&
+        viewModel.headers != null &&
+        viewModel.user!.avatarLink != null) {
       img = NetworkImage("$baseUrl2 ${viewModel.user!.avatarLink}",
           headers: viewModel.headers);
     } else {

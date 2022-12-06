@@ -6,7 +6,6 @@ import 'package:digdes_ui/internal/config/token_storage.dart';
 import 'package:digdes_ui/ui/app_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 class _ViewModel extends ChangeNotifier {
   BuildContext context;
@@ -37,6 +36,10 @@ class _ViewModel extends ChangeNotifier {
   void _refresh() async {
     await _authService.tryGetUser();
   }
+
+  void _toEditor() {
+    AppNavigator.toProfileEditor();
+  }
 }
 
 class Profile extends StatelessWidget {
@@ -46,6 +49,7 @@ class Profile extends StatelessWidget {
   Widget build(BuildContext context) {
     var viewModel = context.watch<_ViewModel>();
     ImageProvider img;
+    var screenSize = MediaQuery.of(context).size;
 
     if (viewModel.user != null &&
         viewModel.headers != null &&
@@ -55,12 +59,6 @@ class Profile extends StatelessWidget {
     } else {
       img = const AssetImage("assets/images/noavatar.png");
     }
-    String dateLocal = "";
-    if (viewModel.user != null) {
-      var time = DateFormat("yyyy-MM-ddTHH:mm:ss")
-          .parse(viewModel.user!.birthDate, true);
-      dateLocal = DateFormat("dd/MM/yyyy").format(time);
-    }
 
     return Scaffold(
         appBar: AppBar(
@@ -68,21 +66,8 @@ class Profile extends StatelessWidget {
             viewModel.user == null ? "Hi" : viewModel.user!.username,
           ),
           actions: [
-            Material(
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              shape: const CircleBorder(),
-              child: InkWell(
-                onTap: () {},
-                child: Ink.image(
-                  image: img,
-                  height: 30,
-                  width: 30,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
             IconButton(
-              onPressed: viewModel._refresh,
+              onPressed: viewModel._toEditor,
               icon: const Icon(Icons.settings),
             ),
             IconButton(
@@ -120,8 +105,7 @@ class Profile extends StatelessWidget {
                           Expanded(
                               flex: 1,
                               child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.25,
+                                  width: screenSize.width * 0.25,
                                   height: 100,
                                   child: Center(
                                       child: Text.rich(
@@ -142,8 +126,7 @@ class Profile extends StatelessWidget {
                           Expanded(
                               flex: 1,
                               child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.25,
+                                  width: screenSize.width * 0.25,
                                   height: 100,
                                   child: Center(
                                       child: Text.rich(
@@ -164,7 +147,8 @@ class Profile extends StatelessWidget {
                           Expanded(
                             flex: 1,
                             child: SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.25,
+                                // TODO : followers page / following page
+                                width: screenSize.width * 0.25,
                                 height: 100,
                                 child: Center(
                                     child: Text.rich(
@@ -175,7 +159,7 @@ class Profile extends StatelessWidget {
                                               "${viewModel.user!.followingsCount}\n",
                                           style: const TextStyle(fontSize: 20)),
                                       const TextSpan(
-                                          text: "Followings",
+                                          text: "Following",
                                           style: TextStyle(fontSize: 12)),
                                     ],
                                   ),
@@ -184,10 +168,13 @@ class Profile extends StatelessWidget {
                           ),
                         ],
                       ),
-                      Text(
-                          "Name: ${viewModel.user!.firstName} ${viewModel.user!.lastName}"),
-                      Text("Bio: ${viewModel.user!.bio}"),
-                      Text("BirthDate: $dateLocal"),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Text.rich(TextSpan(
+                            text: viewModel.user!.bio,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16))),
+                      ),
                     ]))
             : null);
   }
