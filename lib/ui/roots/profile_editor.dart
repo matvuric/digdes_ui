@@ -1,3 +1,4 @@
+import 'package:digdes_ui/data/services/api_service.dart';
 import 'package:digdes_ui/data/services/auth_service.dart';
 import 'package:digdes_ui/domain/models/user.dart';
 import 'package:digdes_ui/internal/config/app_config.dart';
@@ -36,21 +37,36 @@ class _ViewModel extends ChangeNotifier {
   }
 }
 
+// TODO : try make it stateful
 class ProfileEditor extends StatelessWidget {
   const ProfileEditor({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var viewModel = context.watch<_ViewModel>();
-    ImageProvider img;
+    var username = TextEditingController();
+    var firstName = TextEditingController();
+    var lastName = TextEditingController();
+    var bio = TextEditingController();
+    var gender = TextEditingController();
+    var phone = TextEditingController();
+    var email = TextEditingController();
+    ImageProvider img = const AssetImage("assets/images/noavatar.png");
+    final _apiService = ApiService();
 
-    if (viewModel.user != null &&
-        viewModel.headers != null &&
-        viewModel.user!.avatarLink != null) {
-      img = NetworkImage("$baseUrl2 ${viewModel.user!.avatarLink}",
-          headers: viewModel.headers);
-    } else {
-      img = const AssetImage("assets/images/noavatar.png");
+    if (viewModel.user != null && viewModel.headers != null) {
+      username.text = viewModel.user!.username;
+      firstName.text = viewModel.user!.firstName;
+      lastName.text = viewModel.user!.lastName;
+      bio.text = viewModel.user!.bio;
+      gender.text = viewModel.user!.gender;
+      phone.text = viewModel.user!.phone;
+      email.text = viewModel.user!.email;
+
+      if (viewModel.user!.avatarLink != null) {
+        img = NetworkImage("$baseUrl2 ${viewModel.user!.avatarLink}",
+            headers: viewModel.headers);
+      }
     }
 
     return Scaffold(
@@ -58,7 +74,19 @@ class ProfileEditor extends StatelessWidget {
         title: const Text("Edit Profile"),
         actions: [
           IconButton(
-            onPressed: viewModel._refresh,
+            onPressed: () {
+              _apiService.editProfile(
+                  username.text,
+                  firstName.text,
+                  lastName.text,
+                  bio.text,
+                  gender.text,
+                  phone.text,
+                  email.text,
+                  // FIXME
+                  DateTime(2017, 9, 7, 17).toUtc(),
+                  true);
+            },
             icon: const Icon(Icons.done),
           ),
         ],
@@ -90,9 +118,10 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: TextField(
+                              controller: username,
                               decoration: InputDecoration(
-                            hintText: viewModel.user!.username,
-                          )),
+                                hintText: viewModel.user!.username,
+                              )),
                         )
                       ],
                     ),
@@ -102,9 +131,10 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: TextField(
+                              controller: firstName,
                               decoration: InputDecoration(
-                            hintText: viewModel.user!.firstName,
-                          )),
+                                hintText: viewModel.user!.firstName,
+                              )),
                         )
                       ],
                     ),
@@ -114,9 +144,10 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: TextField(
+                              controller: lastName,
                               decoration: InputDecoration(
-                            hintText: viewModel.user!.lastName,
-                          )),
+                                hintText: viewModel.user!.lastName,
+                              )),
                         )
                       ],
                     ),
@@ -126,9 +157,10 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: TextField(
+                              controller: bio,
                               decoration: InputDecoration(
-                            hintText: viewModel.user!.bio,
-                          )),
+                                hintText: viewModel.user!.bio,
+                              )),
                         )
                       ],
                     ),
@@ -145,9 +177,10 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: TextField(
+                              controller: phone,
                               decoration: InputDecoration(
-                            hintText: viewModel.user!.phone,
-                          )),
+                                hintText: viewModel.user!.phone,
+                              )),
                         )
                       ],
                     ),
@@ -158,9 +191,10 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: TextField(
+                              controller: email,
                               decoration: InputDecoration(
-                            hintText: viewModel.user!.email,
-                          )),
+                                hintText: viewModel.user!.email,
+                              )),
                         )
                       ],
                     ),
@@ -179,7 +213,7 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(flex: 1, child: Text("Private account")),
                         Expanded(
                           flex: 2,
-                          child: SwitchExample(),
+                          child: Switcher(),
                         )
                       ],
                     ),
@@ -238,7 +272,7 @@ class _DatePickerState extends State<DatePicker> {
 
   @override
   void initState() {
-    dateController.text = ""; //set the initial value of text field
+    dateController.text = "";
     super.initState();
   }
 
@@ -253,10 +287,10 @@ class _DatePickerState extends State<DatePicker> {
           .parse(viewModel.user!.birthDate, true);
       formattedBirthDate = DateFormat("dd/MM/yyyy").format(time);
     }
+    dateController.text = formattedBirthDate;
 
     return TextField(
         controller: dateController,
-        decoration: InputDecoration(hintText: formattedBirthDate),
         readOnly: true,
         onTap: () async {
           DateTime? pickedDate = await showDatePicker(
@@ -274,14 +308,14 @@ class _DatePickerState extends State<DatePicker> {
   }
 }
 
-class SwitchExample extends StatefulWidget {
-  const SwitchExample({Key? key}) : super(key: key);
+class Switcher extends StatefulWidget {
+  const Switcher({Key? key}) : super(key: key);
 
   @override
-  State<SwitchExample> createState() => _SwitchExampleState();
+  State<Switcher> createState() => _SwitcherState();
 }
 
-class _SwitchExampleState extends State<SwitchExample> {
+class _SwitcherState extends State<Switcher> {
   bool isPrivate = true;
 
   @override
@@ -290,7 +324,6 @@ class _SwitchExampleState extends State<SwitchExample> {
 
     return Switch(
       value: viewModel.user!.isPrivate,
-      activeColor: Colors.green,
       onChanged: (bool value) {
         setState(() {
           isPrivate = value;

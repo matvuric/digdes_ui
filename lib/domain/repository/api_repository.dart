@@ -7,5 +7,16 @@ abstract class ApiRepository {
 
   Future<TokenResponse?> getRefreshToken({required String refreshToken});
 
+  Future editProfile(
+      {String? username,
+      String? firstName,
+      String? lastName,
+      String? bio,
+      String? gender,
+      String? phone,
+      String? email,
+      DateTime? birthDate,
+      bool? isPrivate});
+
   Future<User?> getUser();
 }
