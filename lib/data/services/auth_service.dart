@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:digdes_ui/data/services/data_service.dart';
 import 'package:digdes_ui/domain/repository/api_repository.dart';
 import 'package:digdes_ui/internal/config/shared_preferences.dart';
 import 'package:digdes_ui/internal/config/token_storage.dart';
@@ -8,6 +9,7 @@ import 'package:dio/dio.dart';
 
 class AuthService {
   final ApiRepository _api = RepositoryModule.apiRepository();
+  final DataService _dataService = DataService();
 
   Future auth(String? login, String? password) async {
     if (login != null && password != null) {
@@ -33,18 +35,21 @@ class AuthService {
     }
   }
 
-  Future<bool> tryGetUser() async {
-    try {
-      await _api.getUser();
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
   Future<bool> checkAuth() async {
-    return ((await TokenStorage.getAccessToken()) != null) &&
-        (await SharedPrefs.getStoredUser() != null);
+    var res = false;
+
+    if (await TokenStorage.getAccessToken() != null) {
+      var user = await _api.getUser();
+
+      if (user != null) {
+        await SharedPrefs.setStoredUser(user);
+        await _dataService.createUpdateUser(user);
+      }
+
+      res = true;
+    }
+
+    return res;
   }
 
   Future logOut() async {

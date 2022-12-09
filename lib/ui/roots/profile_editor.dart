@@ -1,5 +1,4 @@
 import 'package:digdes_ui/data/services/api_service.dart';
-import 'package:digdes_ui/data/services/auth_service.dart';
 import 'package:digdes_ui/domain/models/user.dart';
 import 'package:digdes_ui/internal/config/app_config.dart';
 import 'package:digdes_ui/internal/config/shared_preferences.dart';
@@ -12,7 +11,6 @@ const List<String> list = <String>['Male', 'Female', 'Prefer not to say'];
 
 class _ViewModel extends ChangeNotifier {
   BuildContext context;
-  final _authService = AuthService();
   _ViewModel({required this.context}) {
     asyncInit();
   }
@@ -31,10 +29,6 @@ class _ViewModel extends ChangeNotifier {
     headers = {"Authorization": "Bearer $token"};
     user = await SharedPrefs.getStoredUser();
   }
-
-  void _refresh() async {
-    await _authService.tryGetUser();
-  }
 }
 
 // TODO : try make it stateful
@@ -52,7 +46,7 @@ class ProfileEditor extends StatelessWidget {
     var phone = TextEditingController();
     var email = TextEditingController();
     ImageProvider img = const AssetImage("assets/images/noavatar.png");
-    final _apiService = ApiService();
+    final apiService = ApiService();
 
     if (viewModel.user != null && viewModel.headers != null) {
       username.text = viewModel.user!.username;
@@ -75,7 +69,7 @@ class ProfileEditor extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-              _apiService.editProfile(
+              apiService.editProfile(
                   username.text,
                   firstName.text,
                   lastName.text,

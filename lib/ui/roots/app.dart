@@ -1,4 +1,3 @@
-import 'package:digdes_ui/data/services/auth_service.dart';
 import 'package:digdes_ui/domain/models/user.dart';
 import 'package:digdes_ui/internal/config/app_config.dart';
 import 'package:digdes_ui/internal/config/shared_preferences.dart';
@@ -10,7 +9,6 @@ import 'package:provider/provider.dart';
 class _ViewModel extends ChangeNotifier {
   // TODO : add localization
   BuildContext context;
-  final _authService = AuthService();
   _ViewModel({required this.context}) {
     asyncInit();
   }
@@ -28,10 +26,6 @@ class _ViewModel extends ChangeNotifier {
     var token = TokenStorage.getAccessToken();
     headers = {"Authorization": "Bearer $token"};
     user = await SharedPrefs.getStoredUser();
-  }
-
-  void _refresh() async {
-    await _authService.tryGetUser();
   }
 }
 
@@ -71,10 +65,6 @@ class App extends StatelessWidget {
                 fit: BoxFit.contain,
               ),
             ),
-          ),
-          IconButton(
-            onPressed: viewModel._refresh,
-            icon: const Icon(Icons.refresh_outlined),
           ),
         ],
       ),

@@ -33,10 +33,6 @@ class _ViewModel extends ChangeNotifier {
     await _authService.logOut().then((value) => AppNavigator.toLoader());
   }
 
-  void _refresh() async {
-    await _authService.tryGetUser();
-  }
-
   void _toEditor() {
     AppNavigator.toProfileEditor();
   }
@@ -69,10 +65,6 @@ class Profile extends StatelessWidget {
             IconButton(
               onPressed: viewModel._toEditor,
               icon: const Icon(Icons.settings),
-            ),
-            IconButton(
-              onPressed: viewModel._refresh,
-              icon: const Icon(Icons.refresh_outlined),
             ),
             IconButton(
               onPressed: viewModel._logOut,

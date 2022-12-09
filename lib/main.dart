@@ -1,8 +1,12 @@
+import 'package:digdes_ui/data/services/database.dart';
 import 'package:digdes_ui/ui/app_navigator.dart';
 import 'package:digdes_ui/ui/roots/loader.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await DB.instance.init();
+
   runApp(const MyApp());
 }
 
