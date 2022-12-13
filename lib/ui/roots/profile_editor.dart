@@ -92,7 +92,8 @@ class ProfileEditor extends StatelessWidget {
         ],
       ),
       body: (viewModel.user != null)
-          ? Padding(
+          ? SingleChildScrollView(
+              child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +108,7 @@ class ProfileEditor extends StatelessWidget {
                           image: img,
                           height: 100,
                           width: 100,
-                          fit: BoxFit.contain,
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
@@ -119,8 +120,8 @@ class ProfileEditor extends StatelessWidget {
                           flex: 2,
                           child: TextField(
                               controller: username,
-                              decoration: InputDecoration(
-                                hintText: viewModel.user!.username,
+                              decoration: const InputDecoration(
+                                hintText: 'Enter your username',
                               )),
                         )
                       ],
@@ -132,8 +133,8 @@ class ProfileEditor extends StatelessWidget {
                           flex: 2,
                           child: TextField(
                               controller: firstName,
-                              decoration: InputDecoration(
-                                hintText: viewModel.user!.firstName,
+                              decoration: const InputDecoration(
+                                hintText: 'Enter your first name',
                               )),
                         )
                       ],
@@ -145,8 +146,8 @@ class ProfileEditor extends StatelessWidget {
                           flex: 2,
                           child: TextField(
                               controller: lastName,
-                              decoration: InputDecoration(
-                                hintText: viewModel.user!.lastName,
+                              decoration: const InputDecoration(
+                                hintText: 'Enter your last name',
                               )),
                         )
                       ],
@@ -158,8 +159,8 @@ class ProfileEditor extends StatelessWidget {
                           flex: 2,
                           child: TextField(
                               controller: bio,
-                              decoration: InputDecoration(
-                                hintText: viewModel.user!.bio,
+                              decoration: const InputDecoration(
+                                hintText: 'Enter bio',
                               )),
                         )
                       ],
@@ -172,40 +173,29 @@ class ProfileEditor extends StatelessWidget {
                     ),
                     Row(
                       children: [
-                        // TODO : add mask phone
                         const Expanded(flex: 1, child: Text("Phone")),
                         Expanded(
                           flex: 2,
                           child: TextField(
                               controller: phone,
-                              decoration: InputDecoration(
-                                hintText: viewModel.user!.phone,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [maskFormatter],
+                              decoration: const InputDecoration(
+                                hintText: 'Enter your phone number',
                               )),
                         )
                       ],
                     ),
                     Row(
                       children: [
-                        // TODO : add mask phone
-                        const Expanded(flex: 1, child: Text("Phone")),
-                        Expanded(
-                          flex: 2,
-                          child: TextField(
-                            inputFormatters: [maskFormatter],
-                          ),
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        // TODO : add mask email
                         const Expanded(flex: 1, child: Text("Email")),
                         Expanded(
                           flex: 2,
                           child: TextField(
                               controller: email,
-                              decoration: InputDecoration(
-                                hintText: viewModel.user!.email,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: const InputDecoration(
+                                hintText: 'Enter your email',
                               )),
                         )
                       ],
@@ -230,7 +220,7 @@ class ProfileEditor extends StatelessWidget {
                       ],
                     ),
                   ]),
-            )
+            ))
           : null,
     );
   }
@@ -255,8 +245,9 @@ class _DropdownButtonGenderState extends State<DropdownButtonGender> {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<String>(
-      // TODO : adapt to common design
       value: dropdownValue,
+      isExpanded: true,
+      icon: const Icon(Icons.arrow_downward_outlined),
       onChanged: (String? value) {
         setState(() {
           dropdownValue = value!;
@@ -335,7 +326,7 @@ class _SwitcherState extends State<Switcher> {
     var viewModel = context.watch<_ViewModel>();
 
     return Switch(
-      value: viewModel.user!.isPrivate == 1,
+      value: viewModel.user!.isPrivate,
       onChanged: (bool value) {
         setState(() {
           isPrivate = value;

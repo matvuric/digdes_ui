@@ -27,32 +27,27 @@ class ApiModule {
 
   static Dio _addInterceptors(Dio dio) {
     dio.interceptors
-        .add(InterceptorsWrapper(onRequest: (options, handler) async {
+        .add(QueuedInterceptorsWrapper(onRequest: (options, handler) async {
       final token = await TokenStorage.getAccessToken();
       options.headers.addAll({"Authorization": "Bearer $token"});
       return handler.next(options);
     }, onError: ((e, handler) async {
       if (e.response?.statusCode == 401) {
-        dio.lock();
         RequestOptions options = e.response!.requestOptions;
-        var rt = await TokenStorage.getRefreshToken();
+        var refreshToken = await TokenStorage.getRefreshToken();
         try {
-          if (rt != null) {
-            var token = await auth()
-                .getRefreshToken(RefreshTokenRequest(refreshToken: rt));
+          if (refreshToken != null) {
+            var token = await auth().getRefreshToken(
+                RefreshTokenRequest(refreshToken: refreshToken));
             await TokenStorage.setStoredToken(token);
             options.headers["Authorization"] = "Bearer ${token!.accessToken}";
           }
         } catch (e) {
           var service = AuthService();
-          //if (await service.checkAuth()) {
           await service.logOut();
           AppNavigator.toLoader();
-          //}
           return handler
               .resolve(Response(statusCode: 400, requestOptions: options));
-        } finally {
-          dio.unlock();
         }
 
         return handler.resolve(await dio.fetch(options));
