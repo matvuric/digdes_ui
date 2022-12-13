@@ -10,7 +10,6 @@ class PostModel {
   String? caption;
   User author;
   List<PostAttachment> postAttachments;
-  // TODO : NOT NULL in back
   PostModel({
     required this.id,
     this.caption,

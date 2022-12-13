@@ -5,6 +5,7 @@ import 'package:digdes_ui/internal/config/shared_preferences.dart';
 import 'package:digdes_ui/internal/config/token_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
 const List<String> list = <String>['Male', 'Female', 'Prefer not to say'];
@@ -45,6 +46,10 @@ class ProfileEditor extends StatelessWidget {
     var gender = TextEditingController();
     var phone = TextEditingController();
     var email = TextEditingController();
+    var maskFormatter = MaskTextInputFormatter(
+        mask: '+# (###) ###-##-##',
+        filter: {"#": RegExp(r'[0-9]')},
+        type: MaskAutoCompletionType.lazy);
     ImageProvider img = const AssetImage("assets/images/noavatar.png");
     final apiService = ApiService();
 
@@ -64,6 +69,7 @@ class ProfileEditor extends StatelessWidget {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text("Edit Profile"),
         actions: [
@@ -175,6 +181,18 @@ class ProfileEditor extends StatelessWidget {
                               decoration: InputDecoration(
                                 hintText: viewModel.user!.phone,
                               )),
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        // TODO : add mask phone
+                        const Expanded(flex: 1, child: Text("Phone")),
+                        Expanded(
+                          flex: 2,
+                          child: TextField(
+                            inputFormatters: [maskFormatter],
+                          ),
                         )
                       ],
                     ),
@@ -317,7 +335,7 @@ class _SwitcherState extends State<Switcher> {
     var viewModel = context.watch<_ViewModel>();
 
     return Switch(
-      value: viewModel.user!.isPrivate,
+      value: viewModel.user!.isPrivate == 1,
       onChanged: (bool value) {
         setState(() {
           isPrivate = value;

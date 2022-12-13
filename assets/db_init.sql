@@ -20,6 +20,9 @@ CREATE TABLE t_Post(
   id                    TEXT NOT NULL PRIMARY KEY
   ,caption              TEXT
   ,authorId             TEXT NOT NULL
+  ,likesCount           INTEGER
+  ,dislikesCount        INTEGER
+  ,postsCount           INTEGER
   ,FOREIGN KEY(authorId) REFERENCES t_User(id)
 );
 CREATE TABLE t_PostAttachment(
@@ -27,5 +30,6 @@ CREATE TABLE t_PostAttachment(
   ,[name]               TEXT
   ,mimeType             TEXT
   ,postId               TEXT NOT NULL
+  ,attachmentLink       TEXT NOT NULL
   ,FOREIGN KEY(postId) REFERENCES t_Post(id)
 );

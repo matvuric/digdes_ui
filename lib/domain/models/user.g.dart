@@ -35,11 +35,11 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'phone': instance.phone,
       'email': instance.email,
       'birthDate': instance.birthDate,
-      'isPrivate': instance.isPrivate,
       'postsCount': instance.postsCount,
       'followersCount': instance.followersCount,
       'followingsCount': instance.followingsCount,
       'likesCount': instance.likesCount,
       'dislikesCount': instance.dislikesCount,
       'avatarLink': instance.avatarLink,
+      'isPrivate': instance.isPrivate,
     };
