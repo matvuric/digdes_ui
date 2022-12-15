@@ -32,7 +32,6 @@ class _ViewModel extends ChangeNotifier {
   }
 }
 
-// TODO : try make it stateful
 class ProfileEditor extends StatelessWidget {
   const ProfileEditor({Key? key}) : super(key: key);
 
@@ -43,7 +42,6 @@ class ProfileEditor extends StatelessWidget {
     var firstName = TextEditingController();
     var lastName = TextEditingController();
     var bio = TextEditingController();
-    var gender = TextEditingController();
     var phone = TextEditingController();
     var email = TextEditingController();
     var maskFormatter = MaskTextInputFormatter(
@@ -58,7 +56,6 @@ class ProfileEditor extends StatelessWidget {
       firstName.text = viewModel.user!.firstName;
       lastName.text = viewModel.user!.lastName;
       bio.text = viewModel.user!.bio;
-      gender.text = viewModel.user!.gender;
       phone.text = viewModel.user!.phone;
       email.text = viewModel.user!.email;
 
@@ -80,12 +77,13 @@ class ProfileEditor extends StatelessWidget {
                   firstName.text,
                   lastName.text,
                   bio.text,
-                  gender.text,
+                  // FIXME
+                  viewModel.user!.gender,
                   phone.text,
                   email.text,
-                  // FIXME
-                  DateTime(2017, 9, 7, 17).toUtc(),
-                  true);
+                  DateFormat("yyyy-MM-ddTHH:mm:ss")
+                      .parse(viewModel.user!.birthDate, true),
+                  viewModel.user!.isPrivate);
             },
             icon: const Icon(Icons.done),
           ),
@@ -244,6 +242,8 @@ class _DropdownButtonGenderState extends State<DropdownButtonGender> {
 
   @override
   Widget build(BuildContext context) {
+    var viewModel = context.watch<_ViewModel>();
+
     return DropdownButton<String>(
       value: dropdownValue,
       isExpanded: true,
@@ -251,6 +251,7 @@ class _DropdownButtonGenderState extends State<DropdownButtonGender> {
       onChanged: (String? value) {
         setState(() {
           dropdownValue = value!;
+          viewModel.user!.gender = value;
         });
       },
       items: list.map<DropdownMenuItem<String>>((String value) {
@@ -305,6 +306,8 @@ class _DatePickerState extends State<DatePicker> {
             String formattedDate = DateFormat('dd/MM/yyyy').format(pickedDate);
             setState(() {
               dateController.text = formattedDate;
+              viewModel.user!.birthDate =
+                  DateFormat('yyyy-MM-ddTHH:mm:ss').format(pickedDate);
             });
           } else {}
         });
@@ -330,6 +333,7 @@ class _SwitcherState extends State<Switcher> {
       onChanged: (bool value) {
         setState(() {
           isPrivate = value;
+          viewModel.user!.isPrivate = value;
         });
       },
     );
