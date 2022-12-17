@@ -53,11 +53,11 @@ class ProfileEditor extends StatelessWidget {
 
     if (viewModel.user != null && viewModel.headers != null) {
       username.text = viewModel.user!.username;
-      firstName.text = viewModel.user!.firstName;
-      lastName.text = viewModel.user!.lastName;
-      bio.text = viewModel.user!.bio;
-      phone.text = viewModel.user!.phone;
-      email.text = viewModel.user!.email;
+      firstName.text = viewModel.user!.firstName!;
+      lastName.text = viewModel.user!.lastName!;
+      bio.text = viewModel.user!.bio!;
+      phone.text = viewModel.user!.phone!;
+      email.text = viewModel.user!.email!;
 
       if (viewModel.user!.avatarLink != null) {
         img = NetworkImage("$baseUrl2 ${viewModel.user!.avatarLink}",
@@ -81,8 +81,7 @@ class ProfileEditor extends StatelessWidget {
                   viewModel.user!.gender,
                   phone.text,
                   email.text,
-                  DateFormat("yyyy-MM-ddTHH:mm:ss")
-                      .parse(viewModel.user!.birthDate, true),
+                  viewModel.user!.birthDate,
                   viewModel.user!.isPrivate);
             },
             icon: const Icon(Icons.done),
@@ -287,8 +286,7 @@ class _DatePickerState extends State<DatePicker> {
 
     String formattedBirthDate = "";
     if (viewModel.user != null) {
-      var time = DateFormat("yyyy-MM-ddTHH:mm:ss")
-          .parse(viewModel.user!.birthDate, true);
+      var time = viewModel.user!.birthDate!;
       formattedBirthDate = DateFormat("dd/MM/yyyy").format(time);
     }
     dateController.text = formattedBirthDate;
@@ -306,8 +304,7 @@ class _DatePickerState extends State<DatePicker> {
             String formattedDate = DateFormat('dd/MM/yyyy').format(pickedDate);
             setState(() {
               dateController.text = formattedDate;
-              viewModel.user!.birthDate =
-                  DateFormat('yyyy-MM-ddTHH:mm:ss').format(pickedDate);
+              viewModel.user!.birthDate = pickedDate.toUtc();
             });
           } else {}
         });
@@ -329,7 +326,7 @@ class _SwitcherState extends State<Switcher> {
     var viewModel = context.watch<_ViewModel>();
 
     return Switch(
-      value: viewModel.user!.isPrivate,
+      value: viewModel.user!.isPrivate!,
       onChanged: (bool value) {
         setState(() {
           isPrivate = value;

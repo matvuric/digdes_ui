@@ -128,7 +128,7 @@ class _BottomAppBarTest extends StatelessWidget {
 
   final FloatingActionButtonLocation fabLocation;
   final CircularNotchedRectangle? shape;
-  final List<FloatingActionButtonLocation> centerVariants = [
+  final centerVariants = [
     FloatingActionButtonLocation.centerDocked,
     FloatingActionButtonLocation.centerFloat,
   ];

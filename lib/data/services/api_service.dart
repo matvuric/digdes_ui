@@ -1,8 +1,7 @@
-import 'package:digdes_ui/domain/repository/api_repository.dart';
 import 'package:digdes_ui/internal/dependencies/repository_module.dart';
 
 class ApiService {
-  final ApiRepository _api = RepositoryModule.apiRepository();
+  final _api = RepositoryModule.apiRepository();
 
   Future editProfile(
       String? username,

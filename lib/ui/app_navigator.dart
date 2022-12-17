@@ -1,7 +1,7 @@
+import 'package:digdes_ui/ui/profile/profile_widget.dart';
 import 'package:digdes_ui/ui/roots/app.dart';
 import 'package:digdes_ui/ui/roots/auth.dart';
 import 'package:digdes_ui/ui/roots/loader.dart';
-import 'package:digdes_ui/ui/roots/profile.dart';
 import 'package:digdes_ui/ui/roots/profile_editor.dart';
 import 'package:flutter/material.dart';
 
@@ -9,8 +9,8 @@ class NavigationRoutes {
   static const loader = "/";
   static const auth = "/auth";
   static const app = "/app";
-  static const profile = "/profile";
-  static const profileEditor = "/profile_editor";
+  static const profile = "/app/profile";
+  static const profileEditor = "/app/profile/editor";
 }
 
 class AppNavigator {
@@ -21,22 +21,22 @@ class AppNavigator {
         NavigationRoutes.loader, (((route) => false)));
   }
 
-  static void toAuth() {
-    key.currentState
+  static Future toAuth() async {
+    return await key.currentState
         ?.pushNamedAndRemoveUntil(NavigationRoutes.auth, (((route) => false)));
   }
 
-  static void toHome() {
-    key.currentState
+  static Future toHome() async {
+    return await key.currentState
         ?.pushNamedAndRemoveUntil(NavigationRoutes.app, (((route) => false)));
   }
 
-  static void toProfile() {
-    key.currentState?.pushNamed(NavigationRoutes.profile);
+  static Future toProfile() async {
+    return await key.currentState?.pushNamed(NavigationRoutes.profile);
   }
 
-  static void toProfileEditor() {
-    key.currentState?.pushNamed(NavigationRoutes.profileEditor);
+  static Future toProfileEditor() async {
+    return await key.currentState?.pushNamed(NavigationRoutes.profileEditor);
   }
 
   static Route<dynamic>? onGeneratedRoutes(
@@ -53,7 +53,7 @@ class AppNavigator {
 
       case NavigationRoutes.profile:
         return PageRouteBuilder(
-            pageBuilder: ((_, __, ___) => Profile.create()));
+            pageBuilder: ((_, __, ___) => ProfileWidget.create()));
 
       case NavigationRoutes.profileEditor:
         return PageRouteBuilder(

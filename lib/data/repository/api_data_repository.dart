@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:digdes_ui/data/clients/api_client.dart';
 import 'package:digdes_ui/data/clients/auth_client.dart';
+import 'package:digdes_ui/domain/models/attachment_meta.dart';
 import 'package:digdes_ui/domain/models/edit_profile.dart';
+import 'package:digdes_ui/domain/models/post_model.dart';
 import 'package:digdes_ui/domain/models/refresh_token_request.dart';
 import 'package:digdes_ui/domain/models/token_request.dart';
 import 'package:digdes_ui/domain/models/token_response.dart';
@@ -10,7 +14,6 @@ import 'package:digdes_ui/domain/repository/api_repository.dart';
 class ApiDataRepository extends ApiRepository {
   final AuthClient _auth;
   final ApiClient _api;
-
   ApiDataRepository(this._auth, this._api);
 
   @override
@@ -49,4 +52,15 @@ class ApiDataRepository extends ApiRepository {
 
   @override
   Future<User?> getUser() async => await _api.getUser();
+
+  @override
+  Future<List<PostModel>> getPosts(int skip, int take) async =>
+      await _api.getPosts(skip, take);
+
+  @override
+  Future<List<AttachmentMeta>> uploadTemp({required List<File> files}) =>
+      _api.uploadTemp(files: files);
+
+  @override
+  Future setAvatar(AttachmentMeta model) => _api.setAvatar(model);
 }

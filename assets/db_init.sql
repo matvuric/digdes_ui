@@ -19,6 +19,7 @@ CREATE TABLE t_User(
 CREATE TABLE t_Post(
   id                    TEXT NOT NULL PRIMARY KEY
   ,caption              TEXT
+  ,createdDate          TEXT NOT NULL
   ,authorId             TEXT NOT NULL
   ,likesCount           INTEGER
   ,dislikesCount        INTEGER

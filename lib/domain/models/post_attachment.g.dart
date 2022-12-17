@@ -12,7 +12,7 @@ PostAttachment _$PostAttachmentFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       mimeType: json['mimeType'] as String,
       attachmentLink: json['attachmentLink'] as String,
-      postId: json['postId'] as String,
+      postId: json['postId'] as String?,
     );
 
 Map<String, dynamic> _$PostAttachmentToJson(PostAttachment instance) =>

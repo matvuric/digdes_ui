@@ -9,14 +9,14 @@ import 'package:uuid/uuid.dart';
 
 class DB {
   DB._();
-  static final DB instance = DB._();
+  static final instance = DB._();
   static late Database _db;
   static bool initialized = false;
 
   Future init() async {
     if (!initialized) {
       var databasePath = await getDatabasesPath();
-      var path = join(databasePath, "db_v1.0.8.db");
+      var path = join(databasePath, "db_v1.0.10.db");
 
       _db = await openDatabase(path, version: 1, onCreate: _createDB);
       initialized = true;

@@ -1,15 +1,14 @@
 import 'dart:io';
 
 import 'package:digdes_ui/data/services/data_service.dart';
-import 'package:digdes_ui/domain/repository/api_repository.dart';
 import 'package:digdes_ui/internal/config/shared_preferences.dart';
 import 'package:digdes_ui/internal/config/token_storage.dart';
 import 'package:digdes_ui/internal/dependencies/repository_module.dart';
 import 'package:dio/dio.dart';
 
 class AuthService {
-  final ApiRepository _api = RepositoryModule.apiRepository();
-  final DataService _dataService = DataService();
+  final _api = RepositoryModule.apiRepository();
+  final _dataService = DataService();
 
   Future auth(String? login, String? password) async {
     if (login != null && password != null) {

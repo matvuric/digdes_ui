@@ -1,49 +1,17 @@
-import 'package:digdes_ui/data/services/auth_service.dart';
-import 'package:digdes_ui/domain/models/user.dart';
+import 'dart:io';
+
 import 'package:digdes_ui/internal/config/app_config.dart';
-import 'package:digdes_ui/internal/config/shared_preferences.dart';
-import 'package:digdes_ui/internal/config/token_storage.dart';
 import 'package:digdes_ui/ui/app_navigator.dart';
+import 'package:digdes_ui/ui/profile/profile_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class _ViewModel extends ChangeNotifier {
-  BuildContext context;
-  final _authService = AuthService();
-  _ViewModel({required this.context}) {
-    asyncInit();
-  }
-
-  User? _user;
-  User? get user => _user;
-  set user(User? value) {
-    _user = value;
-    notifyListeners();
-  }
-
-  Map<String, String>? headers;
-
-  void asyncInit() async {
-    var token = TokenStorage.getAccessToken();
-    headers = {"Authorization": "Bearer $token"};
-    user = await SharedPrefs.getStoredUser();
-  }
-
-  void _logOut() async {
-    await _authService.logOut().then((value) => AppNavigator.toLoader());
-  }
-
-  void _toEditor() {
-    AppNavigator.toProfileEditor();
-  }
-}
-
-class Profile extends StatelessWidget {
-  const Profile({Key? key}) : super(key: key);
+class ProfileWidget extends StatelessWidget {
+  const ProfileWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var viewModel = context.watch<_ViewModel>();
+    var viewModel = context.watch<ProfileViewModel>();
     ImageProvider img;
     var screenSize = MediaQuery.of(context).size;
 
@@ -62,12 +30,12 @@ class Profile extends StatelessWidget {
             viewModel.user == null ? "Hi" : viewModel.user!.username,
           ),
           actions: [
-            IconButton(
-              onPressed: viewModel._toEditor,
-              icon: const Icon(Icons.settings),
+            const IconButton(
+              onPressed: AppNavigator.toProfileEditor,
+              icon: Icon(Icons.settings),
             ),
             IconButton(
-              onPressed: viewModel._logOut,
+              onPressed: viewModel.logOut,
               icon: const Icon(Icons.exit_to_app_outlined),
             ),
           ],
@@ -85,12 +53,14 @@ class Profile extends StatelessWidget {
                             clipBehavior: Clip.antiAliasWithSaveLayer,
                             shape: const CircleBorder(),
                             child: InkWell(
-                              onTap: () {},
+                              onTap: viewModel.changeAvatar,
                               child: Ink.image(
-                                image: img,
+                                image: (viewModel.imagePath != null
+                                    ? FileImage(File(viewModel.imagePath!))
+                                    : img),
                                 height: 100,
                                 width: 100,
-                                fit: BoxFit.contain,
+                                fit: BoxFit.cover,
                               ),
                             ),
                           ),
@@ -171,9 +141,9 @@ class Profile extends StatelessWidget {
             : null);
   }
 
-  static Widget create() {
+  static create() {
     return ChangeNotifierProvider(
-        create: (BuildContext context) => _ViewModel(context: context),
-        child: const Profile());
+        create: (context) => ProfileViewModel(context: context),
+        child: const ProfileWidget());
   }
 }

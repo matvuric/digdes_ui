@@ -1,5 +1,7 @@
-import 'package:digdes_ui/domain/db_model.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:json_annotation/json_annotation.dart';
+
+import 'package:digdes_ui/domain/db_model.dart';
 
 part 'user.g.dart';
 
@@ -8,38 +10,39 @@ class User implements DbModel {
   @override
   late String id;
   late String username;
-  late String firstName;
-  late String lastName;
-  late String bio;
-  late String gender;
-  late String phone;
-  late String email;
-  late String birthDate;
-  late int postsCount;
+  late String? firstName;
+  late String? lastName;
+  late String? bio;
+  late String? gender;
+  late String? phone;
+  late String? email;
+  late DateTime? birthDate;
+  late int? postsCount;
   late int followersCount;
   late int followingsCount;
-  late int likesCount;
-  late int dislikesCount;
+  late int? likesCount;
+  late int? dislikesCount;
   late String? avatarLink;
-  late bool isPrivate;
+  late bool? isPrivate;
 
   User({
+    // TODO : make another model
     required this.id,
     required this.username,
-    required this.firstName,
-    required this.lastName,
-    required this.bio,
-    required this.gender,
-    required this.phone,
-    required this.email,
-    required this.birthDate,
-    required this.isPrivate,
-    required this.postsCount,
+    this.firstName,
+    this.lastName,
+    this.bio,
+    this.gender,
+    this.phone,
+    this.email,
+    this.birthDate,
+    this.isPrivate,
+    this.postsCount,
     required this.followersCount,
     required this.followingsCount,
-    required this.likesCount,
-    required this.dislikesCount,
-    required this.avatarLink,
+    this.likesCount,
+    this.dislikesCount,
+    this.avatarLink,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
@@ -55,7 +58,9 @@ class User implements DbModel {
     gender = map["gender"];
     phone = map["phone"];
     email = map["email"];
-    birthDate = map["birthDate"];
+    birthDate = map["birthDate"] == null
+        ? null
+        : DateTime.parse(map['birthDate'] as String);
     isPrivate = map["isPrivate"] == 1;
     postsCount = map["postsCount"];
     followersCount = map["followersCount"];
@@ -76,7 +81,7 @@ class User implements DbModel {
     map['gender'] = gender;
     map['phone'] = phone;
     map['email'] = email;
-    map['birthDate'] = birthDate;
+    map['birthDate'] = birthDate.toString();
     map['isPrivate'] = isPrivate;
     map['postsCount'] = postsCount;
     map['followersCount'] = followersCount;
@@ -84,17 +89,49 @@ class User implements DbModel {
     map['likesCount'] = likesCount;
     map['dislikesCount'] = dislikesCount;
     map['avatarLink'] = avatarLink;
-    map['isPrivate'] = isPrivate ? 1 : 0;
+    map['isPrivate'] = isPrivate! ? 1 : 0;
     return map;
   }
-}
-
-class IntToBoolConverter implements JsonConverter<int, bool> {
-  const IntToBoolConverter();
 
   @override
-  int fromJson(bool json) => json ? 1 : 0;
+  bool operator ==(covariant User other) {
+    if (identical(this, other)) return true;
+
+    return other.id == id &&
+        other.username == username &&
+        other.firstName == firstName &&
+        other.lastName == lastName &&
+        other.bio == bio &&
+        other.gender == gender &&
+        other.phone == phone &&
+        other.email == email &&
+        other.birthDate == birthDate &&
+        other.postsCount == postsCount &&
+        other.followersCount == followersCount &&
+        other.followingsCount == followingsCount &&
+        other.likesCount == likesCount &&
+        other.dislikesCount == dislikesCount &&
+        other.avatarLink == avatarLink &&
+        other.isPrivate == isPrivate;
+  }
 
   @override
-  bool toJson(int object) => object == 1;
+  int get hashCode {
+    return id.hashCode ^
+        username.hashCode ^
+        firstName.hashCode ^
+        lastName.hashCode ^
+        bio.hashCode ^
+        gender.hashCode ^
+        phone.hashCode ^
+        email.hashCode ^
+        birthDate.hashCode ^
+        postsCount.hashCode ^
+        followersCount.hashCode ^
+        followingsCount.hashCode ^
+        likesCount.hashCode ^
+        dislikesCount.hashCode ^
+        avatarLink.hashCode ^
+        isPrivate.hashCode;
+  }
 }

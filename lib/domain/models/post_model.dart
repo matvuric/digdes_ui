@@ -8,11 +8,13 @@ part 'post_model.g.dart';
 class PostModel {
   String id;
   String? caption;
+  DateTime createdDate;
   User author;
   List<PostAttachment> postAttachments;
   PostModel({
     required this.id,
     this.caption,
+    required this.createdDate,
     required this.author,
     required this.postAttachments,
   });
