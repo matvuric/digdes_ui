@@ -73,7 +73,7 @@ class CameraWidgetState extends State<CameraWidget> {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
-                    color: Colors.blue,
+                    color: const Color(0xff6750a4),
                     border: Border.all(
                       color: Colors.white,
                       width: 2,

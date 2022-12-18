@@ -207,7 +207,6 @@ class ProfileEditor extends StatelessWidget {
                       ],
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
                       children: const [
                         Expanded(flex: 1, child: Text("Private account")),
                         Expanded(

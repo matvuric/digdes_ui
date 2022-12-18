@@ -19,12 +19,12 @@ class _ApiClient implements ApiClient {
   String? baseUrl;
 
   @override
-  Future<dynamic> editProfile(body) async {
+  Future<dynamic> editProfile(model) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
-    _data.addAll(body.toJson());
+    _data.addAll(model.toJson());
     final _result = await _dio.fetch(_setStreamType<dynamic>(Options(
       method: 'POST',
       headers: _headers,

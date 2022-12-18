@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:digdes_ui/data/clients/api_client.dart';
 import 'package:digdes_ui/data/clients/auth_client.dart';
 import 'package:digdes_ui/domain/models/attachment_meta.dart';
+import 'package:digdes_ui/domain/models/create_account.dart';
 import 'package:digdes_ui/domain/models/edit_profile.dart';
 import 'package:digdes_ui/domain/models/post_model.dart';
 import 'package:digdes_ui/domain/models/refresh_token_request.dart';
@@ -27,6 +28,10 @@ class ApiDataRepository extends ApiRepository {
     return await _auth
         .getRefreshToken(RefreshTokenRequest(refreshToken: refreshToken));
   }
+
+  @override
+  Future createAccount({required CreateAccount model}) async =>
+      await _auth.createAccount(model);
 
   @override
   Future editProfile(

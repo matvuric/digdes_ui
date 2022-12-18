@@ -1,3 +1,4 @@
+import 'package:digdes_ui/domain/models/create_account.dart';
 import 'package:digdes_ui/domain/models/refresh_token_request.dart';
 import 'package:digdes_ui/domain/models/token_request.dart';
 import 'package:digdes_ui/domain/models/token_response.dart';
@@ -15,6 +16,7 @@ abstract class AuthClient {
 
   @POST("/api/Auth/RefreshToken")
   Future<TokenResponse?> getRefreshToken(@Body() RefreshTokenRequest body);
-}
 
-// flutter packages pub run build_runner build --delete-conflicting-outputs
+  @POST("/api/Auth/RegisterUser")
+  Future createAccount(@Body() CreateAccount model);
+}

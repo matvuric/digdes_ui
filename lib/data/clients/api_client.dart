@@ -14,7 +14,7 @@ abstract class ApiClient {
   factory ApiClient(Dio dio, {String? baseUrl}) = _ApiClient;
 
   @POST("api/User/EditUserProfile")
-  Future editProfile(@Body() EditProfile body);
+  Future editProfile(@Body() EditProfile model);
 
   @POST("api/Attachment/UploadFiles")
   Future<List<AttachmentMeta>> uploadTemp(

@@ -1,28 +1,16 @@
-import 'dart:io';
-
-import 'package:digdes_ui/internal/config/app_config.dart';
 import 'package:digdes_ui/ui/app_navigator.dart';
-import 'package:digdes_ui/ui/profile/profile_view_model.dart';
+import 'package:digdes_ui/ui/profile/profile_vm.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-class ProfileWidget extends StatelessWidget {
-  const ProfileWidget({Key? key}) : super(key: key);
+class Profile extends StatelessWidget {
+  const Profile({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var viewModel = context.watch<ProfileViewModel>();
-    ImageProvider img;
     var screenSize = MediaQuery.of(context).size;
-
-    if (viewModel.user != null &&
-        viewModel.headers != null &&
-        viewModel.user!.avatarLink != null) {
-      img = NetworkImage("$baseUrl2 ${viewModel.user!.avatarLink}",
-          headers: viewModel.headers);
-    } else {
-      img = const AssetImage("assets/images/noavatar.png");
-    }
 
     return Scaffold(
         appBar: AppBar(
@@ -53,11 +41,35 @@ class ProfileWidget extends StatelessWidget {
                             clipBehavior: Clip.antiAliasWithSaveLayer,
                             shape: const CircleBorder(),
                             child: InkWell(
-                              onTap: viewModel.changeAvatar,
+                              onTap: () => showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  title: const Text(
+                                      'How do you want to choose photo?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        viewModel
+                                            .pickImage(ImageSource.gallery);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('From Gallery'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        viewModel.pickImage(ImageSource.camera);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('By Camera'),
+                                    ),
+                                  ],
+                                ),
+                              ),
                               child: Ink.image(
-                                image: (viewModel.imagePath != null
-                                    ? FileImage(File(viewModel.imagePath!))
-                                    : img),
+                                image: viewModel.avatar != null
+                                    ? viewModel.avatar!.image
+                                    : const AssetImage(
+                                        "assets/images/noavatar.png"),
                                 height: 100,
                                 width: 100,
                                 fit: BoxFit.cover,
@@ -110,6 +122,7 @@ class ProfileWidget extends StatelessWidget {
                             flex: 1,
                             child: SizedBox(
                                 // TODO : followers page / following page
+                                // TODO : delete avatar
                                 width: screenSize.width * 0.25,
                                 height: 100,
                                 child: Center(
@@ -141,9 +154,9 @@ class ProfileWidget extends StatelessWidget {
             : null);
   }
 
-  static create() {
+  static create(BuildContext bc) {
     return ChangeNotifierProvider(
-        create: (context) => ProfileViewModel(context: context),
-        child: const ProfileWidget());
+        create: (context) => ProfileViewModel(context: bc),
+        child: const Profile());
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:digdes_ui/data/services/data_service.dart';
+import 'package:digdes_ui/domain/models/create_account.dart';
 import 'package:digdes_ui/internal/config/shared_preferences.dart';
 import 'package:digdes_ui/internal/config/token_storage.dart';
 import 'package:digdes_ui/internal/dependencies/repository_module.dart';
@@ -54,6 +55,9 @@ class AuthService {
   Future logOut() async {
     await TokenStorage.setStoredToken(null);
   }
+
+  Future createAccount(CreateAccount model) async =>
+      await _api.createAccount(model: model);
 }
 
 class NoNetworkException implements Exception {}

@@ -5,17 +5,18 @@ import 'package:digdes_ui/domain/models/user.dart';
 import 'package:digdes_ui/internal/config/app_config.dart';
 import 'package:digdes_ui/internal/config/shared_preferences.dart';
 import 'package:digdes_ui/internal/config/token_storage.dart';
-import 'package:digdes_ui/ui/app_navigator.dart';
+import 'package:digdes_ui/ui/profile/profile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-class _ViewModel extends ChangeNotifier {
+class AppViewModel extends ChangeNotifier {
   // TODO : add localization
   BuildContext context;
   final _dataService = DataService();
   final _listViewController = ScrollController();
 
-  _ViewModel({required this.context}) {
+  AppViewModel({required this.context}) {
     asyncInit();
     _listViewController.addListener(() {
       var max = _listViewController.position.maxScrollExtent;
@@ -47,6 +48,13 @@ class _ViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Image? _avatar;
+  Image? get avatar => _avatar;
+  set avatar(Image? value) {
+    _avatar = value;
+    notifyListeners();
+  }
+
   Map<String, String>? headers;
   List<PostModel>? _posts;
   List<PostModel>? get posts => _posts;
@@ -57,23 +65,35 @@ class _ViewModel extends ChangeNotifier {
 
   Map<int, int> pager = <int, int>{};
 
-  void onPageChanged(int listIndex, int pageIndex) {
-    pager[listIndex] = pageIndex;
-    notifyListeners();
-  }
-
   void asyncInit() async {
     var token = TokenStorage.getAccessToken();
     headers = {"Authorization": "Bearer $token"};
     user = await SharedPrefs.getStoredUser();
 
+    if (user!.avatarLink != null) {
+      var img =
+          await NetworkAssetBundle(Uri.parse("$baseUrl2${user!.avatarLink}"))
+              .load("$baseUrl2${user!.avatarLink}");
+      avatar = Image.memory(img.buffer.asUint8List());
+    }
+
     await SyncService().syncPosts();
     posts = await _dataService.getPosts();
+  }
+
+  void onPageChanged(int listIndex, int pageIndex) {
+    pager[listIndex] = pageIndex;
+    notifyListeners();
   }
 
   void goUp() {
     _listViewController.animateTo(0,
         duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
+  }
+
+  void toProfile(BuildContext bc) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (__) => Profile.create(bc)));
   }
 }
 
@@ -82,18 +102,18 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var viewModel = context.watch<_ViewModel>();
+    var viewModel = context.watch<AppViewModel>();
     var screenSize = MediaQuery.of(context).size;
-    ImageProvider img;
 
-    if (viewModel.user != null &&
-        viewModel.headers != null &&
-        viewModel.user!.avatarLink != null) {
-      img = NetworkImage("$baseUrl2 ${viewModel.user!.avatarLink}",
-          headers: viewModel.headers);
-    } else {
-      img = const AssetImage("assets/images/noavatar.png");
-    }
+    // ImageProvider img;
+    // if (viewModel.user != null &&
+    //     viewModel.headers != null &&
+    //     viewModel.user!.avatarLink != null) {
+    //   img = NetworkImage("$baseUrl2 ${viewModel.user!.avatarLink}",
+    //       headers: viewModel.headers);
+    // } else {
+    //   img = const AssetImage("assets/images/noavatar.png");
+    // }
 
     return Scaffold(
         appBar: AppBar(
@@ -104,11 +124,13 @@ class App extends StatelessWidget {
               clipBehavior: Clip.antiAliasWithSaveLayer,
               shape: const CircleBorder(),
               child: InkWell(
-                onTap: AppNavigator.toProfile,
+                onTap: () => viewModel.toProfile(context),
                 child: Ink.image(
-                  image: img,
-                  height: 30,
-                  width: 30,
+                  image: viewModel.avatar != null
+                      ? viewModel.avatar!.image
+                      : const AssetImage("assets/images/noavatar.png"),
+                  height: 40,
+                  width: 40,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -177,7 +199,7 @@ class App extends StatelessWidget {
 
   static Widget create() {
     return ChangeNotifierProvider(
-        create: (BuildContext context) => _ViewModel(context: context),
+        create: (BuildContext context) => AppViewModel(context: context),
         child: const App());
   }
 }
@@ -197,7 +219,8 @@ class PageIndicator extends StatelessWidget {
       for (var i = 0; i < count; i++) {
         widgets.add(Icon(Icons.circle,
             size: width,
-            color: i == (current ?? 0) ? Colors.blue : Colors.white));
+            color:
+                i == (current ?? 0) ? const Color(0xff6750a4) : Colors.white));
       }
     }
     return Wrap(

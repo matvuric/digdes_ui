@@ -1,6 +1,5 @@
-import 'package:digdes_ui/ui/profile/profile_widget.dart';
 import 'package:digdes_ui/ui/roots/app.dart';
-import 'package:digdes_ui/ui/roots/auth.dart';
+import 'package:digdes_ui/ui/auth/auth.dart';
 import 'package:digdes_ui/ui/roots/loader.dart';
 import 'package:digdes_ui/ui/roots/profile_editor.dart';
 import 'package:flutter/material.dart';
@@ -31,10 +30,6 @@ class AppNavigator {
         ?.pushNamedAndRemoveUntil(NavigationRoutes.app, (((route) => false)));
   }
 
-  static Future toProfile() async {
-    return await key.currentState?.pushNamed(NavigationRoutes.profile);
-  }
-
   static Future toProfileEditor() async {
     return await key.currentState?.pushNamed(NavigationRoutes.profileEditor);
   }
@@ -50,10 +45,6 @@ class AppNavigator {
 
       case NavigationRoutes.app:
         return PageRouteBuilder(pageBuilder: ((_, __, ___) => App.create()));
-
-      case NavigationRoutes.profile:
-        return PageRouteBuilder(
-            pageBuilder: ((_, __, ___) => ProfileWidget.create()));
 
       case NavigationRoutes.profileEditor:
         return PageRouteBuilder(
