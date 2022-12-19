@@ -1,69 +1,22 @@
-import 'package:digdes_ui/data/services/api_service.dart';
-import 'package:digdes_ui/domain/models/user.dart';
-import 'package:digdes_ui/internal/config/app_config.dart';
-import 'package:digdes_ui/internal/config/shared_preferences.dart';
-import 'package:digdes_ui/internal/config/token_storage.dart';
+import 'package:digdes_ui/ui/profile/profile_editor/profile_editor_vm.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
-const List<String> list = <String>['Male', 'Female', 'Prefer not to say'];
-
-class _ViewModel extends ChangeNotifier {
-  BuildContext context;
-  _ViewModel({required this.context}) {
-    asyncInit();
-  }
-
-  User? _user;
-  User? get user => _user;
-  set user(User? value) {
-    _user = value;
-    notifyListeners();
-  }
-
-  Map<String, String>? headers;
-
-  void asyncInit() async {
-    var token = TokenStorage.getAccessToken();
-    headers = {"Authorization": "Bearer $token"};
-    user = await SharedPrefs.getStoredUser();
-  }
-}
+const List<String> genderList = <String>['Male', 'Female', 'Prefer not to say'];
 
 class ProfileEditor extends StatelessWidget {
   const ProfileEditor({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var viewModel = context.watch<_ViewModel>();
-    var username = TextEditingController();
-    var firstName = TextEditingController();
-    var lastName = TextEditingController();
-    var bio = TextEditingController();
-    var phone = TextEditingController();
-    var email = TextEditingController();
+    var viewModel = context.watch<ProfileEditorViewModel>();
     var maskFormatter = MaskTextInputFormatter(
         mask: '+# (###) ###-##-##',
         filter: {"#": RegExp(r'[0-9]')},
         type: MaskAutoCompletionType.lazy);
-    ImageProvider img = const AssetImage("assets/images/noavatar.png");
-    final apiService = ApiService();
-
-    if (viewModel.user != null && viewModel.headers != null) {
-      username.text = viewModel.user!.username;
-      firstName.text = viewModel.user!.firstName!;
-      lastName.text = viewModel.user!.lastName!;
-      bio.text = viewModel.user!.bio!;
-      phone.text = viewModel.user!.phone!;
-      email.text = viewModel.user!.email!;
-
-      if (viewModel.user!.avatarLink != null) {
-        img = NetworkImage("$baseUrl2 ${viewModel.user!.avatarLink}",
-            headers: viewModel.headers);
-      }
-    }
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -71,19 +24,7 @@ class ProfileEditor extends StatelessWidget {
         title: const Text("Edit Profile"),
         actions: [
           IconButton(
-            onPressed: () {
-              apiService.editProfile(
-                  username.text,
-                  firstName.text,
-                  lastName.text,
-                  bio.text,
-                  // FIXME
-                  viewModel.user!.gender,
-                  phone.text,
-                  email.text,
-                  viewModel.user!.birthDate,
-                  viewModel.user!.isPrivate);
-            },
+            onPressed: viewModel.confirm,
             icon: const Icon(Icons.done),
           ),
         ],
@@ -99,10 +40,33 @@ class ProfileEditor extends StatelessWidget {
                       clipBehavior: Clip.antiAliasWithSaveLayer,
                       shape: const CircleBorder(),
                       child: InkWell(
-                        // TODO: edit avatar method
-                        onTap: () {},
+                        onTap: () => showDialog<String>(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title:
+                                const Text('How do you want to choose photo?'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  viewModel.pickImage(ImageSource.gallery);
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('From Gallery'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  viewModel.pickImage(ImageSource.camera);
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('By Camera'),
+                              ),
+                            ],
+                          ),
+                        ),
                         child: Ink.image(
-                          image: img,
+                          image: viewModel.avatar != null
+                              ? viewModel.avatar!.image
+                              : const AssetImage("assets/images/noavatar.png"),
                           height: 100,
                           width: 100,
                           fit: BoxFit.cover,
@@ -116,7 +80,7 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: TextField(
-                              controller: username,
+                              controller: viewModel.username,
                               decoration: const InputDecoration(
                                 hintText: 'Enter your username',
                               )),
@@ -129,7 +93,7 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: TextField(
-                              controller: firstName,
+                              controller: viewModel.firstName,
                               decoration: const InputDecoration(
                                 hintText: 'Enter your first name',
                               )),
@@ -142,7 +106,7 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: TextField(
-                              controller: lastName,
+                              controller: viewModel.lastName,
                               decoration: const InputDecoration(
                                 hintText: 'Enter your last name',
                               )),
@@ -155,7 +119,7 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: TextField(
-                              controller: bio,
+                              controller: viewModel.bio,
                               decoration: const InputDecoration(
                                 hintText: 'Enter bio',
                               )),
@@ -174,7 +138,7 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: TextField(
-                              controller: phone,
+                              controller: viewModel.phone,
                               keyboardType: TextInputType.number,
                               inputFormatters: [maskFormatter],
                               decoration: const InputDecoration(
@@ -189,7 +153,7 @@ class ProfileEditor extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: TextField(
-                              controller: email,
+                              controller: viewModel.email,
                               keyboardType: TextInputType.emailAddress,
                               decoration: const InputDecoration(
                                 hintText: 'Enter your email',
@@ -221,9 +185,9 @@ class ProfileEditor extends StatelessWidget {
     );
   }
 
-  static Widget create() {
+  static Widget create(BuildContext bc) {
     return ChangeNotifierProvider(
-        create: (BuildContext context) => _ViewModel(context: context),
+        create: (BuildContext context) => ProfileEditorViewModel(context: bc),
         child: const ProfileEditor());
   }
 }
@@ -236,11 +200,11 @@ class DropdownButtonGender extends StatefulWidget {
 }
 
 class _DropdownButtonGenderState extends State<DropdownButtonGender> {
-  String dropdownValue = list.first;
+  String dropdownValue = genderList.first;
 
   @override
   Widget build(BuildContext context) {
-    var viewModel = context.watch<_ViewModel>();
+    var viewModel = context.watch<ProfileEditorViewModel>();
 
     return DropdownButton<String>(
       value: dropdownValue,
@@ -250,9 +214,10 @@ class _DropdownButtonGenderState extends State<DropdownButtonGender> {
         setState(() {
           dropdownValue = value!;
           viewModel.user!.gender = value;
+          // TODO : is not selected without click
         });
       },
-      items: list.map<DropdownMenuItem<String>>((String value) {
+      items: genderList.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
@@ -280,7 +245,7 @@ class _DatePickerState extends State<DatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    var viewModel = context.watch<_ViewModel>();
+    var viewModel = context.watch<ProfileEditorViewModel>();
     var initialDate = DateTime.now().year - 18;
 
     String formattedBirthDate = "";
@@ -322,7 +287,7 @@ class _SwitcherState extends State<Switcher> {
 
   @override
   Widget build(BuildContext context) {
-    var viewModel = context.watch<_ViewModel>();
+    var viewModel = context.watch<ProfileEditorViewModel>();
 
     return Switch(
       value: viewModel.user!.isPrivate!,
