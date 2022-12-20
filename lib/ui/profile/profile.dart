@@ -1,5 +1,7 @@
+import 'package:digdes_ui/ui/app_navigator.dart';
 import 'package:digdes_ui/ui/profile/profile_vm.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class Profile extends StatelessWidget {
@@ -16,13 +18,9 @@ class Profile extends StatelessWidget {
             viewModel.user == null ? "Hi" : viewModel.user!.username,
           ),
           actions: [
-            IconButton(
-              onPressed: () => viewModel.toPostCreator(context),
-              icon: const Icon(Icons.add),
-            ),
-            IconButton(
-              onPressed: () => viewModel.toEditor(context),
-              icon: const Icon(Icons.settings),
+            const IconButton(
+              onPressed: AppNavigator.toProfileEditor,
+              icon: Icon(Icons.settings),
             ),
             IconButton(
               onPressed: viewModel.logOut,
@@ -43,7 +41,30 @@ class Profile extends StatelessWidget {
                             clipBehavior: Clip.antiAliasWithSaveLayer,
                             shape: const CircleBorder(),
                             child: InkWell(
-                              onTap: () {},
+                              onTap: () => showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  title: const Text(
+                                      'How do you want to choose photo?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        viewModel
+                                            .pickImage(ImageSource.gallery);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('From Gallery'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        viewModel.pickImage(ImageSource.camera);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('By Camera'),
+                                    ),
+                                  ],
+                                ),
+                              ),
                               child: Ink.image(
                                 image: viewModel.avatar != null
                                     ? viewModel.avatar!.image

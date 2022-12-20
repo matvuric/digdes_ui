@@ -1,9 +1,102 @@
+import 'package:digdes_ui/data/services/data_service.dart';
+import 'package:digdes_ui/data/services/sync_service.dart';
+import 'package:digdes_ui/domain/models/post_model.dart';
+import 'package:digdes_ui/domain/models/user.dart';
 import 'package:digdes_ui/internal/config/app_config.dart';
-import 'package:digdes_ui/ui/app/app_vm.dart';
+import 'package:digdes_ui/internal/config/shared_preferences.dart';
+import 'package:digdes_ui/internal/config/token_storage.dart';
+import 'package:digdes_ui/ui/profile/profile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-// TODO : add localization
+class AppViewModel extends ChangeNotifier {
+  // TODO : add localization
+  BuildContext context;
+  final _dataService = DataService();
+  final _listViewController = ScrollController();
+
+  AppViewModel({required this.context}) {
+    asyncInit();
+    _listViewController.addListener(() {
+      var max = _listViewController.position.maxScrollExtent;
+      var current = _listViewController.offset;
+      var percent = current / max * 100;
+      if (percent > 80) {
+        if (!isLoading) {
+          isLoading = true;
+          Future.delayed(const Duration(seconds: 1)).then((value) {
+            posts = <PostModel>[...posts!, ...posts!];
+            isLoading = false;
+          });
+        }
+      }
+    });
+  }
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+  set isLoading(bool val) {
+    _isLoading = val;
+    notifyListeners();
+  }
+
+  User? _user;
+  User? get user => _user;
+  set user(User? value) {
+    _user = value;
+    notifyListeners();
+  }
+
+  Image? _avatar;
+  Image? get avatar => _avatar;
+  set avatar(Image? value) {
+    _avatar = value;
+    notifyListeners();
+  }
+
+  Map<String, String>? headers;
+  List<PostModel>? _posts;
+  List<PostModel>? get posts => _posts;
+  set posts(List<PostModel>? val) {
+    _posts = val;
+    notifyListeners();
+  }
+
+  Map<int, int> pager = <int, int>{};
+
+  void asyncInit() async {
+    var token = TokenStorage.getAccessToken();
+    headers = {"Authorization": "Bearer $token"};
+    user = await SharedPrefs.getStoredUser();
+
+    if (user!.avatarLink != null) {
+      var img =
+          await NetworkAssetBundle(Uri.parse("$baseUrl2${user!.avatarLink}"))
+              .load("$baseUrl2${user!.avatarLink}");
+      avatar = Image.memory(img.buffer.asUint8List());
+    }
+
+    await SyncService().syncPosts();
+    posts = await _dataService.getPosts();
+  }
+
+  void onPageChanged(int listIndex, int pageIndex) {
+    pager[listIndex] = pageIndex;
+    notifyListeners();
+  }
+
+  void goUp() {
+    _listViewController.animateTo(0,
+        duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
+  }
+
+  void toProfile(BuildContext bc) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (__) => Profile.create(bc)));
+  }
+}
+
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
 
@@ -11,6 +104,16 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     var viewModel = context.watch<AppViewModel>();
     var screenSize = MediaQuery.of(context).size;
+
+    // ImageProvider img;
+    // if (viewModel.user != null &&
+    //     viewModel.headers != null &&
+    //     viewModel.user!.avatarLink != null) {
+    //   img = NetworkImage("$baseUrl2 ${viewModel.user!.avatarLink}",
+    //       headers: viewModel.headers);
+    // } else {
+    //   img = const AssetImage("assets/images/noavatar.png");
+    // }
 
     return Scaffold(
         appBar: AppBar(
@@ -45,24 +148,28 @@ class App extends StatelessWidget {
                     children: [
                       Expanded(
                           child: ListView.separated(
-                              controller: viewModel.listViewController,
+                              controller: viewModel._listViewController,
                               itemBuilder: (listContext, listIndex) {
                                 Widget res;
                                 var posts = viewModel.posts;
 
                                 if (posts != null) {
                                   var post = posts[listIndex];
-                                  res = SizedBox(
+                                  res = Container(
                                     height: screenSize.width,
+                                    color: Colors.grey,
                                     child: Column(children: [
                                       Expanded(
                                         child: PageView.builder(
                                           itemBuilder:
                                               ((pageContext, pageIndex) =>
-                                                  Image(
-                                                      image: NetworkImage(
-                                                    "$baseUrl2${post.postAttachments[pageIndex].attachmentLink}",
-                                                  ))),
+                                                  Container(
+                                                    color: Colors.yellow,
+                                                    child: Image(
+                                                        image: NetworkImage(
+                                                      "$baseUrl2 ${post.postAttachments[pageIndex].attachmentLink}",
+                                                    )),
+                                                  )),
                                           itemCount:
                                               post.postAttachments.length,
                                           onPageChanged: (value) => viewModel
@@ -113,7 +220,7 @@ class PageIndicator extends StatelessWidget {
         widgets.add(Icon(Icons.circle,
             size: width,
             color:
-                i == (current ?? 0) ? const Color(0xff6750a4) : Colors.grey));
+                i == (current ?? 0) ? const Color(0xff6750a4) : Colors.white));
       }
     }
     return Wrap(

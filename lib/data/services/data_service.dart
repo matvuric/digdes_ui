@@ -34,9 +34,6 @@ class DataService {
       }
     }
 
-    res.sort(((a, b) => DateTime.parse(b.createdDate.toString())
-        .compareTo(DateTime.parse(a.createdDate.toString()))));
-
     return res;
   }
 }

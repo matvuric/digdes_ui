@@ -1,25 +1,35 @@
 import 'dart:io';
 
-import 'package:digdes_ui/data/services/api_service.dart';
 import 'package:digdes_ui/data/services/auth_service.dart';
 import 'package:digdes_ui/domain/models/attachment_meta.dart';
 import 'package:digdes_ui/domain/models/create_account.dart';
+import 'package:digdes_ui/internal/dependencies/repository_module.dart';
+import 'package:digdes_ui/ui/auth/auth_vm.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
-class AccountCreatorViewModel extends ChangeNotifier {
-  final authService = AuthService();
-  final apiService = ApiService();
+class SignUpViewModel extends ChangeNotifier {
   BuildContext context;
-  AccountCreatorViewModel({required this.context}) {
-    asyncInit();
-  }
+  final authService = AuthService();
+  final _api = RepositoryModule.apiRepository();
 
   File? _img;
   File? get img => _img;
   set img(File? value) {
     _img = value;
     notifyListeners();
+  }
+
+  var _state = ViewModelState();
+  ViewModelState get state => _state;
+  set state(ViewModelState val) {
+    _state = val;
+    notifyListeners();
+  }
+
+  SignUpViewModel({required this.context}) {
+    asyncInit();
   }
 
   CreateAccount? _user;
@@ -38,7 +48,9 @@ class AccountCreatorViewModel extends ChangeNotifier {
   var password = TextEditingController();
   var retryPassword = TextEditingController();
 
-  Future asyncInit() async {
+  Map<String, String>? headers;
+
+  void asyncInit() async {
     user = CreateAccount(
       username: '',
       firstName: '',
@@ -74,19 +86,23 @@ class AccountCreatorViewModel extends ChangeNotifier {
   }
 
   Future pickImage(ImageSource source) async {
-    final pickedImg = await ImagePicker().pickImage(source: source);
+    try {
+      final pickedImg = await ImagePicker().pickImage(source: source);
 
-    if (pickedImg != null) {
-      final imgTemp = File(pickedImg.path);
-      img = imgTemp;
+      if (pickedImg != null) {
+        final imgTemp = File(pickedImg.path);
+        img = imgTemp;
 
-      if (img != null) {
-        var t = await apiService.uploadTemp([img!]);
+        if (img != null) {
+          var t = await _api.uploadTemp(files: [img!]);
 
-        if (t.isNotEmpty) {
-          user?.image = t.first;
+          if (t.isNotEmpty) {
+            user?.image = t.first;
+          }
         }
       }
+    } on PlatformException catch (e) {
+      print("Failed to pick image: $e");
     }
   }
 }

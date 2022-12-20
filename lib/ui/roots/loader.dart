@@ -6,12 +6,13 @@ import '../app_navigator.dart';
 
 class _ViewModel extends ChangeNotifier {
   final _authService = AuthService();
+
   BuildContext context;
   _ViewModel({required this.context}) {
-    asyncInit();
+    _asyncInit();
   }
 
-  Future asyncInit() async {
+  void _asyncInit() async {
     if (await _authService.checkAuth()) {
       AppNavigator.toHome();
     } else {

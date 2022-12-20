@@ -4,7 +4,6 @@ import 'package:digdes_ui/data/clients/api_client.dart';
 import 'package:digdes_ui/data/clients/auth_client.dart';
 import 'package:digdes_ui/domain/models/attachment_meta.dart';
 import 'package:digdes_ui/domain/models/create_account.dart';
-import 'package:digdes_ui/domain/models/create_post.dart';
 import 'package:digdes_ui/domain/models/edit_profile.dart';
 import 'package:digdes_ui/domain/models/post_model.dart';
 import 'package:digdes_ui/domain/models/refresh_token_request.dart';
@@ -35,8 +34,26 @@ class ApiDataRepository extends ApiRepository {
       await _auth.createAccount(model);
 
   @override
-  Future editProfile({required EditProfile model}) async =>
-      await _api.editProfile(model);
+  Future editProfile(
+          {String? username,
+          String? firstName,
+          String? lastName,
+          String? bio,
+          String? gender,
+          String? phone,
+          String? email,
+          DateTime? birthDate,
+          bool? isPrivate}) async =>
+      await _api.editProfile(EditProfile(
+          username: username,
+          firstName: firstName,
+          lastName: lastName,
+          bio: bio,
+          gender: gender,
+          phone: phone,
+          email: email,
+          birthDate: birthDate,
+          isPrivate: isPrivate));
 
   @override
   Future<User?> getUser() async => await _api.getUser();
@@ -46,12 +63,9 @@ class ApiDataRepository extends ApiRepository {
       await _api.getPosts(skip, take);
 
   @override
-  Future<List<AttachmentMeta>> uploadTemp({required List<File> files}) async =>
-      await _api.uploadTemp(files: files);
+  Future<List<AttachmentMeta>> uploadTemp({required List<File> files}) =>
+      _api.uploadTemp(files: files);
 
   @override
-  Future setAvatar(AttachmentMeta model) async => await _api.setAvatar(model);
-
-  @override
-  Future createPost(CreatePost model) async => await _api.createPost(model);
+  Future setAvatar(AttachmentMeta model) => _api.setAvatar(model);
 }

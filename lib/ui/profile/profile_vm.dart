@@ -1,18 +1,21 @@
+import 'dart:io';
+
 import 'package:digdes_ui/data/services/auth_service.dart';
-import 'package:digdes_ui/domain/models/post_model.dart';
 import 'package:digdes_ui/domain/models/user.dart';
 import 'package:digdes_ui/internal/config/app_config.dart';
 import 'package:digdes_ui/internal/config/shared_preferences.dart';
-import 'package:digdes_ui/ui/app/app_vm.dart';
+import 'package:digdes_ui/internal/dependencies/repository_module.dart';
 import 'package:digdes_ui/ui/app_navigator.dart';
-import 'package:digdes_ui/ui/profile/post_creator/post_creator.dart';
-import 'package:digdes_ui/ui/profile/profile_editor/profile_editor.dart';
+import 'package:digdes_ui/ui/roots/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class ProfileViewModel extends ChangeNotifier {
   final _authService = AuthService();
+  // TODO : replace with service methods
+  final _api = RepositoryModule.apiRepository();
   final BuildContext context;
   ProfileViewModel({required this.context}) {
     asyncInit();
@@ -25,19 +28,7 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Image? _avatar;
-  Image? get avatar => _avatar;
-  set avatar(Image? value) {
-    _avatar = value;
-    notifyListeners();
-  }
-
-  List<PostModel>? _posts;
-  List<PostModel>? get posts => _posts;
-  set posts(List<PostModel>? val) {
-    _posts = val;
-    notifyListeners();
-  }
+  Map<String, String>? headers;
 
   Future asyncInit() async {
     user = await SharedPrefs.getStoredUser();
@@ -49,27 +40,44 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
+  File? _img;
+
+  Image? _avatar;
+  Image? get avatar => _avatar;
+  set avatar(Image? value) {
+    _avatar = value;
+    notifyListeners();
+  }
+
+  Future pickImage(ImageSource source) async {
+    try {
+      var appModel = context.read<AppViewModel>();
+      final pickedImg = await ImagePicker().pickImage(source: source);
+
+      if (pickedImg != null) {
+        final imgTemp = File(pickedImg.path);
+        _img = imgTemp;
+
+        if (_img != null) {
+          var t = await _api.uploadTemp(files: [_img!]);
+
+          if (t.isNotEmpty) {
+            await _api.setAvatar(t.first);
+            var img = await NetworkAssetBundle(
+                    Uri.parse("$baseUrl2${user!.avatarLink}"))
+                .load("$baseUrl2${user!.avatarLink}");
+            var avImage = Image.memory(img.buffer.asUint8List());
+            avatar = avImage;
+            appModel.avatar = avImage;
+          }
+        }
+      }
+    } on PlatformException catch (e) {
+      print("Failed to pick image: $e");
+    }
+  }
+
   void logOut() async {
     await _authService.logOut().then((value) => AppNavigator.toLoader());
-  }
-
-  void toEditor(BuildContext bc) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (__) => ProfileEditor.create(bc)));
-  }
-
-  void toPostCreator(BuildContext bc) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (__) => PostCreator.create(bc)));
-  }
-
-  void addAvatar(Image avatar) {
-    var appModel = context.read<AppViewModel>();
-    appModel.avatar = avatar;
-  }
-
-  void addPost() {
-    var appModel = context.read<AppViewModel>();
-    appModel.asyncInit();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:digdes_ui/data/services/auth_service.dart';
 import 'package:digdes_ui/ui/app_navigator.dart';
-import 'package:digdes_ui/ui/auth/account_creator/account_creator.dart';
+import 'package:digdes_ui/ui/create_account/sign_up.dart';
 import 'package:flutter/material.dart';
 
 class ViewModelState {
@@ -78,6 +78,6 @@ class AuthViewModel extends ChangeNotifier {
 
   void toSignUp() {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (__) => AccountCreator.create()));
+        .push(MaterialPageRoute(builder: (__) => SignUp.create()));
   }
 }
