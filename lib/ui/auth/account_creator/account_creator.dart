@@ -1,5 +1,5 @@
 import 'package:digdes_ui/ui/app_navigator.dart';
-import 'package:digdes_ui/ui/create_account/sign_up_vm.dart';
+import 'package:digdes_ui/ui/auth/account_creator/account_creator_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -8,12 +8,12 @@ import 'package:provider/provider.dart';
 
 const List<String> list = <String>['Male', 'Female', 'Prefer not to say'];
 
-class SignUp extends StatelessWidget {
-  const SignUp({Key? key}) : super(key: key);
+class AccountCreator extends StatelessWidget {
+  const AccountCreator({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var viewModel = context.watch<SignUpViewModel>();
+    var viewModel = context.watch<AccountCreatorViewModel>();
     final maskFormatter = MaskTextInputFormatter(
         mask: '+# (###) ###-##-##',
         filter: {"#": RegExp(r'[0-9]')},
@@ -214,8 +214,9 @@ class SignUp extends StatelessWidget {
 
   static Widget create() {
     return ChangeNotifierProvider(
-        create: (BuildContext context) => SignUpViewModel(context: context),
-        child: const SignUp());
+        create: (BuildContext context) =>
+            AccountCreatorViewModel(context: context),
+        child: const AccountCreator());
   }
 }
 
@@ -231,7 +232,7 @@ class _DropdownButtonGenderState extends State<DropdownButtonGender> {
 
   @override
   Widget build(BuildContext context) {
-    var viewModel = context.watch<SignUpViewModel>();
+    var viewModel = context.watch<AccountCreatorViewModel>();
 
     return DropdownButton<String>(
       value: dropdownValue,
@@ -271,7 +272,7 @@ class _DatePickerState extends State<DatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    var viewModel = context.watch<SignUpViewModel>();
+    var viewModel = context.watch<AccountCreatorViewModel>();
     var initialDate = DateTime.now().year - 18;
 
     return TextField(
@@ -309,7 +310,7 @@ class _SwitcherState extends State<Switcher> {
 
   @override
   Widget build(BuildContext context) {
-    var viewModel = context.watch<SignUpViewModel>();
+    var viewModel = context.watch<AccountCreatorViewModel>();
 
     return Switch(
       value: isPrivate,

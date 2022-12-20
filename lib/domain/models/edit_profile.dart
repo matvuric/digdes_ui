@@ -4,15 +4,15 @@ part 'edit_profile.g.dart';
 
 @JsonSerializable()
 class EditProfile {
-  final String? username;
-  final String? firstName;
-  final String? lastName;
-  final String? bio;
-  final String? gender;
-  final String? phone;
-  final String? email;
-  final DateTime? birthDate;
-  final bool? isPrivate;
+  late String? username;
+  late String? firstName;
+  late String? lastName;
+  late String? bio;
+  late String? gender;
+  late String? phone;
+  late String? email;
+  late DateTime? birthDate;
+  late bool? isPrivate;
 
   EditProfile({
     required this.username,

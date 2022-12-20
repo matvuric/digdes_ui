@@ -8,7 +8,7 @@ class SyncService {
 
   Future syncPosts() async {
     var postModels = await _api.getPosts(0, 100);
-    var authors = postModels.map((e) => e.author).toSet();
+    // var authors = postModels.map((e) => e.author).toSet();
     var postAttachments = postModels
         .expand((x) => x.postAttachments.map((e) => e.copyWith(postId: x.id)))
         .toList();
