@@ -4,7 +4,7 @@ import 'package:digdes_ui/data/services/auth_service.dart';
 import 'package:digdes_ui/domain/models/refresh_token_request.dart';
 import 'package:digdes_ui/internal/config/app_config.dart';
 import 'package:digdes_ui/internal/config/token_storage.dart';
-import 'package:digdes_ui/ui/app_navigator.dart';
+import 'package:digdes_ui/ui/navigation/app_navigator.dart';
 import 'package:dio/dio.dart';
 
 class ApiModule {
