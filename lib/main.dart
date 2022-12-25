@@ -1,11 +1,11 @@
-import 'package:digdes_ui/data/services/database.dart';
+import 'package:digdes_ui/internal/init_app.dart';
 import 'package:digdes_ui/ui/navigation/app_navigator.dart';
 import 'package:digdes_ui/ui/widgets/roots/loader.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await DB.instance.init();
+  await initApp();
 
   runApp(const MyApp());
 }

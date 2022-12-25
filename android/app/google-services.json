@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "385681437373",
+    "project_id": "seismic-bonfire-354222",
+    "storage_bucket": "seismic-bonfire-354222.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:385681437373:android:416bfd00303bff44187dd4",
+        "android_client_info": {
+          "package_name": "com.example.digdes_ui"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "385681437373-iiin0na5gdvodarl9j5g5g9r0ri3ppvv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTSqZpxLzYoizmgLCS5f8xwtuoOEV6SWc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "385681437373-iiin0na5gdvodarl9j5g5g9r0ri3ppvv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
