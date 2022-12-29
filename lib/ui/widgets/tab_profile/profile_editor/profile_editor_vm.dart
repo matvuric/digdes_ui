@@ -5,6 +5,7 @@ import 'package:digdes_ui/domain/models/edit_profile.dart';
 import 'package:digdes_ui/domain/models/user.dart';
 import 'package:digdes_ui/internal/config/app_config.dart';
 import 'package:digdes_ui/internal/config/shared_preferences.dart';
+import 'package:digdes_ui/ui/widgets/roots/app_vm.dart';
 import 'package:digdes_ui/ui/widgets/tab_profile/profile_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,49 +68,66 @@ class ProfileEditorViewModel extends ChangeNotifier {
 
     profile = EditProfile(
       username: user!.username,
-      firstName: user!.firstName,
-      lastName: user!.lastName,
-      bio: user!.bio,
-      gender: user!.gender,
-      phone: user!.phone,
-      email: user!.email,
-      birthDate: user!.birthDate,
-      isPrivate: user!.isPrivate,
+      firstName: user!.firstName!,
+      lastName: user!.lastName!,
+      bio: user!.bio!,
+      gender: user!.gender!,
+      phone: user!.phone!,
+      email: user!.email!,
+      birthDate: user!.birthDate!,
+      isPrivate: user!.isPrivate!,
     );
   }
 
   Future pickImage(ImageSource source) async {
-    var profileModel = context.read<ProfileViewModel>();
     final pickedImg = await ImagePicker().pickImage(source: source);
 
     if (pickedImg != null) {
       final imgTemp = File(pickedImg.path);
       _img = imgTemp;
-      if (_img != null) {
-        var t = await apiService.uploadTemp([_img!]);
-
-        if (t.isNotEmpty) {
-          await apiService.setAvatar(t.first);
-          var img = await NetworkAssetBundle(
-                  Uri.parse("$baseUrl2${user!.avatarLink}"))
-              .load("$baseUrl2${user!.avatarLink}");
-          var avImage = Image.memory(img.buffer.asUint8List());
-          avatar = avImage;
-          profileModel.avatar = avImage;
-          profileModel.addAvatar(avImage);
-        }
-      }
+      avatar = Image.file(imgTemp);
     }
   }
 
   void confirm() async {
-    profile?.username = username.text;
-    profile?.firstName = firstName.text;
-    profile?.lastName = lastName.text;
-    profile?.bio = bio.text;
-    profile?.phone = phone.text;
-    profile?.email = email.text;
+    profile!.username = username.text;
+    profile!.firstName = firstName.text;
+    profile!.lastName = lastName.text;
+    profile!.bio = bio.text;
+    profile!.phone = phone.text;
+    profile!.email = email.text;
 
+    if (_img != null) {
+      var t = await apiService.uploadTemp([_img!]);
+
+      if (t.isNotEmpty) {
+        await apiService.setAvatar(t.first);
+      }
+    }
+
+    updateAvatar();
     await apiService.editProfile(profile!);
+  }
+
+  bool checkFields() {
+    if (user!.username != username.text ||
+        user!.firstName != firstName.text ||
+        user!.lastName != lastName.text ||
+        user!.bio != bio.text ||
+        user!.gender != profile!.gender ||
+        user!.phone != phone.text ||
+        user!.email != email.text ||
+        user!.birthDate != profile!.birthDate ||
+        user!.isPrivate != profile!.isPrivate) {
+      return true;
+    }
+    return false;
+  }
+
+  void updateAvatar() {
+    var profileModel = context.read<ProfileViewModel>();
+    var appModel = context.read<AppViewModel>();
+    profileModel.avatar = avatar;
+    appModel.avatar = avatar;
   }
 }

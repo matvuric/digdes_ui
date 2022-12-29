@@ -29,19 +29,19 @@ class User implements DbModel {
     // TODO : make another model
     required this.id,
     required this.username,
-    this.firstName,
-    this.lastName,
-    this.bio,
-    this.gender,
-    this.phone,
-    this.email,
-    this.birthDate,
-    this.isPrivate,
-    this.postsCount,
+    required this.firstName,
+    required this.lastName,
+    required this.bio,
+    required this.gender,
+    required this.phone,
+    required this.email,
+    required this.birthDate,
+    required this.isPrivate,
+    required this.postsCount,
     required this.followersCount,
     required this.followingsCount,
-    this.likesCount,
-    this.dislikesCount,
+    required this.likesCount,
+    required this.dislikesCount,
     this.avatarLink,
   });
 
@@ -58,9 +58,9 @@ class User implements DbModel {
     gender = map["gender"];
     phone = map["phone"];
     email = map["email"];
-    birthDate = map["birthDate"] == null
+    birthDate = (map["birthDate"] == null
         ? null
-        : DateTime.parse(map['birthDate'] as String);
+        : DateTime.parse(map['birthDate'] as String))!;
     isPrivate = map["isPrivate"] == 1;
     postsCount = map["postsCount"];
     followersCount = map["followersCount"];

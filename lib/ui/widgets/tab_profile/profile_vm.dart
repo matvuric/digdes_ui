@@ -7,6 +7,7 @@ import 'package:digdes_ui/ui/widgets/roots/app_vm.dart';
 import 'package:digdes_ui/ui/navigation/app_navigator.dart';
 import 'package:digdes_ui/ui/widgets/tab_profile/profile_editor/profile_editor.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class ProfileViewModel extends ChangeNotifier {
@@ -40,12 +41,12 @@ class ProfileViewModel extends ChangeNotifier {
   Future asyncInit() async {
     user = await SharedPrefs.getStoredUser();
     if (user!.avatarLink != null && user != null) {
-      // var img =
-      //     await NetworkAssetBundle(Uri.parse('$baseUrl2${user!.avatarLink}'))
-      //         .load('$baseUrl2${user!.avatarLink}');
-      // avatar = Image.memory(img.buffer.asUint8List());
+      var img =
+          await NetworkAssetBundle(Uri.parse('$baseUrl2${user!.avatarLink}'))
+              .load('$baseUrl2${user!.avatarLink}');
+      avatar = Image.memory(img.buffer.asUint8List());
 
-      avatar = Image.network('$baseUrl2${user!.avatarLink}');
+      // avatar = Image.network('$baseUrl2${user!.avatarLink}');
     }
   }
 
