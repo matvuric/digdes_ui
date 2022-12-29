@@ -11,60 +11,70 @@ class Home extends StatelessWidget {
     var viewModel = context.watch<HomeViewModel>();
     var screenSize = MediaQuery.of(context).size;
 
-    return SafeArea(
-        child: Container(
-            child: viewModel.posts == null
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    children: [
-                      Expanded(
-                          child: ListView.separated(
-                              controller: viewModel.listViewController,
-                              itemBuilder: (_, listIndex) {
-                                Widget res;
-                                var posts = viewModel.posts;
+    return Scaffold(
+        appBar: AppBar(title: const Text("NastyGram"), actions: [
+          IconButton(
+              onPressed: viewModel.toPostCreator,
+              icon: const Icon(Icons.post_add_outlined))
+        ]),
+        body: SafeArea(
+            child: Container(
+                child: viewModel.posts == null
+                    ? const Center(child: CircularProgressIndicator())
+                    : Column(
+                        children: [
+                          Expanded(
+                              child: ListView.separated(
+                                  controller: viewModel.listViewController,
+                                  itemBuilder: (_, listIndex) {
+                                    Widget res;
+                                    var posts = viewModel.posts;
 
-                                if (posts != null) {
-                                  var post = posts[listIndex];
-                                  res = GestureDetector(
-                                      onTap: () =>
-                                          viewModel.toPostDetails(post.id),
-                                      child: SizedBox(
-                                        height: screenSize.width,
-                                        child: Column(children: [
-                                          Expanded(
-                                            child: PageView.builder(
-                                              itemBuilder: ((_, pageIndex) =>
-                                                  Image(
-                                                      image: NetworkImage(
-                                                    "$baseUrl2${post.postAttachments[pageIndex].attachmentLink}",
-                                                  ))),
-                                              itemCount:
-                                                  post.postAttachments.length,
-                                              onPageChanged: (value) =>
-                                                  viewModel.onPageChanged(
-                                                      listIndex, value),
-                                            ),
-                                          ),
-                                          PageIndicator(
-                                            count: post.postAttachments.length,
-                                            current: viewModel.pager[listIndex],
-                                          ),
-                                          Text(post.caption ?? "")
-                                        ]),
-                                      ));
-                                } else {
-                                  res = const SizedBox.shrink();
-                                }
+                                    if (posts != null) {
+                                      var post = posts[listIndex];
+                                      res = GestureDetector(
+                                          onTap: () =>
+                                              viewModel.toPostDetails(post.id),
+                                          child: SizedBox(
+                                            height: screenSize.width,
+                                            child: Column(children: [
+                                              Expanded(
+                                                child: PageView.builder(
+                                                  itemBuilder: ((_,
+                                                          pageIndex) =>
+                                                      Image(
+                                                          image: NetworkImage(
+                                                        "$baseUrl2${post.postAttachments[pageIndex].attachmentLink}",
+                                                      ))),
+                                                  itemCount: post
+                                                      .postAttachments.length,
+                                                  onPageChanged: (value) =>
+                                                      viewModel.onPageChanged(
+                                                          listIndex, value),
+                                                ),
+                                              ),
+                                              PageIndicator(
+                                                count:
+                                                    post.postAttachments.length,
+                                                current:
+                                                    viewModel.pager[listIndex],
+                                              ),
+                                              Text(post.caption ?? "")
+                                            ]),
+                                          ));
+                                    } else {
+                                      res = const SizedBox.shrink();
+                                    }
 
-                                return res;
-                              },
-                              separatorBuilder: ((context, index) =>
-                                  const Divider()),
-                              itemCount: viewModel.posts?.length ?? 0)),
-                      if (viewModel.isLoading) const CircularProgressIndicator()
-                    ],
-                  )));
+                                    return res;
+                                  },
+                                  separatorBuilder: ((context, index) =>
+                                      const Divider()),
+                                  itemCount: viewModel.posts?.length ?? 0)),
+                          if (viewModel.isLoading)
+                            const CircularProgressIndicator()
+                        ],
+                      ))));
   }
 
   static Widget create() {

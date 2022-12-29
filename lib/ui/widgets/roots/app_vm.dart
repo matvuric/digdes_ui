@@ -14,7 +14,7 @@ class AppViewModel extends ChangeNotifier {
   final navigationKeys = {
     TabItemEnum.home: GlobalKey<NavigatorState>(),
     TabItemEnum.search: GlobalKey<NavigatorState>(),
-    TabItemEnum.newPost: GlobalKey<NavigatorState>(),
+    TabItemEnum.reels: GlobalKey<NavigatorState>(),
     TabItemEnum.favs: GlobalKey<NavigatorState>(),
     TabItemEnum.profile: GlobalKey<NavigatorState>(),
   };

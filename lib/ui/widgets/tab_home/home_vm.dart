@@ -1,6 +1,7 @@
 import 'package:digdes_ui/data/services/data_service.dart';
 import 'package:digdes_ui/data/services/sync_service.dart';
 import 'package:digdes_ui/domain/models/post_model.dart';
+import 'package:digdes_ui/ui/navigation/app_navigator.dart';
 import 'package:digdes_ui/ui/navigation/tab_navigator.dart';
 import 'package:digdes_ui/ui/widgets/tab_profile/profile.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +49,21 @@ class HomeViewModel extends ChangeNotifier {
     posts = await _dataService.getPosts();
   }
 
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) {
+      super.notifyListeners();
+    }
+  }
+
   void onPageChanged(int listIndex, int pageIndex) {
     pager[listIndex] = pageIndex;
     notifyListeners();
@@ -66,5 +82,9 @@ class HomeViewModel extends ChangeNotifier {
   void toPostDetails(String id) {
     Navigator.of(context)
         .pushNamed(TabNavigatorRoutes.postDetails, arguments: id);
+  }
+
+  void toPostCreator() {
+    AppNavigator.toPostCreator().then((value) => asyncInit());
   }
 }

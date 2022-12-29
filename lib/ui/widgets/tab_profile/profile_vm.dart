@@ -5,10 +5,8 @@ import 'package:digdes_ui/internal/config/app_config.dart';
 import 'package:digdes_ui/internal/config/shared_preferences.dart';
 import 'package:digdes_ui/ui/widgets/roots/app_vm.dart';
 import 'package:digdes_ui/ui/navigation/app_navigator.dart';
-import 'package:digdes_ui/ui/widgets/tab_profile/post_creator/post_creator.dart';
 import 'package:digdes_ui/ui/widgets/tab_profile/profile_editor/profile_editor.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class ProfileViewModel extends ChangeNotifier {
@@ -41,11 +39,13 @@ class ProfileViewModel extends ChangeNotifier {
 
   Future asyncInit() async {
     user = await SharedPrefs.getStoredUser();
-    if (user!.avatarLink != null) {
-      var img =
-          await NetworkAssetBundle(Uri.parse("$baseUrl2${user!.avatarLink}"))
-              .load("$baseUrl2${user!.avatarLink}");
-      avatar = Image.memory(img.buffer.asUint8List());
+    if (user!.avatarLink != null && user != null) {
+      // var img =
+      //     await NetworkAssetBundle(Uri.parse('$baseUrl2${user!.avatarLink}'))
+      //         .load('$baseUrl2${user!.avatarLink}');
+      // avatar = Image.memory(img.buffer.asUint8List());
+
+      avatar = Image.network('$baseUrl2${user!.avatarLink}');
     }
   }
 
@@ -58,18 +58,8 @@ class ProfileViewModel extends ChangeNotifier {
         .push(MaterialPageRoute(builder: (__) => ProfileEditor.create(bc)));
   }
 
-  void toPostCreator(BuildContext bc) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (__) => PostCreator.create()));
-  }
-
   void addAvatar(Image avatar) {
     var appModel = context.read<AppViewModel>();
     appModel.avatar = avatar;
-  }
-
-  void addPost() {
-    var appModel = context.read<AppViewModel>();
-    appModel.asyncInit();
   }
 }

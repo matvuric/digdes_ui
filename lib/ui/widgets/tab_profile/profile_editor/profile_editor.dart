@@ -172,7 +172,7 @@ class ProfileEditor extends StatelessWidget {
                     ),
                     Row(
                       children: const [
-                        Expanded(flex: 1, child: Text("Private account")),
+                        Expanded(flex: 1, child: Text("Private profile")),
                         Expanded(
                           flex: 2,
                           child: Switcher(),

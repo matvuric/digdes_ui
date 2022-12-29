@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:digdes_ui/domain/models/attachment_meta.dart';
-import 'package:digdes_ui/domain/models/create_account.dart';
+import 'package:digdes_ui/domain/models/create_profile.dart';
 import 'package:digdes_ui/domain/models/create_post.dart';
 import 'package:digdes_ui/domain/models/edit_profile.dart';
 import 'package:digdes_ui/domain/models/post_model.dart';
+import 'package:digdes_ui/domain/models/push_token.dart';
 import 'package:digdes_ui/domain/models/token_response.dart';
 import 'package:digdes_ui/domain/models/user.dart';
 
@@ -14,7 +15,7 @@ abstract class ApiRepository {
 
   Future<TokenResponse?> getRefreshToken({required String refreshToken});
 
-  Future createAccount({required CreateAccount model});
+  Future createProfile({required CreateProfile model});
 
   Future editProfile({required EditProfile model});
 
@@ -23,6 +24,10 @@ abstract class ApiRepository {
   Future setAvatar(AttachmentMeta model);
 
   Future createPost(CreatePost model);
+
+  Future subscribe(PushToken model);
+
+  Future unsubscribe();
 
   Future<User?> getUser();
 

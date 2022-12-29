@@ -17,10 +17,6 @@ class Profile extends StatelessWidget {
           ),
           actions: [
             IconButton(
-              onPressed: () => viewModel.toPostCreator(context),
-              icon: const Icon(Icons.add),
-            ),
-            IconButton(
               onPressed: () => viewModel.toEditor(context),
               icon: const Icon(Icons.settings),
             ),

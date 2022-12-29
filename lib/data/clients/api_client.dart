@@ -4,6 +4,7 @@ import 'package:digdes_ui/domain/models/attachment_meta.dart';
 import 'package:digdes_ui/domain/models/create_post.dart';
 import 'package:digdes_ui/domain/models/edit_profile.dart';
 import 'package:digdes_ui/domain/models/post_model.dart';
+import 'package:digdes_ui/domain/models/push_token.dart';
 import 'package:digdes_ui/domain/models/user.dart';
 import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
@@ -26,6 +27,12 @@ abstract class ApiClient {
 
   @POST("api/Post/CreatePost")
   Future createPost(@Body() CreatePost model);
+
+  @POST('api/Push/Subscribe')
+  Future subscribe(@Body() PushToken model);
+
+  @DELETE('api/Push/Unsubscribe')
+  Future unsubscribe();
 
   @GET("api/User/GetCurrentUser")
   Future<User?> getUser();

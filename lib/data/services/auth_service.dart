@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:digdes_ui/data/services/data_service.dart';
-import 'package:digdes_ui/domain/models/create_account.dart';
+import 'package:digdes_ui/domain/models/create_profile.dart';
+import 'package:digdes_ui/domain/models/push_token.dart';
 import 'package:digdes_ui/internal/config/shared_preferences.dart';
 import 'package:digdes_ui/internal/config/token_storage.dart';
 import 'package:digdes_ui/internal/dependencies/repository_module.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class AuthService {
   final _api = RepositoryModule.apiRepository();
@@ -40,8 +42,13 @@ class AuthService {
 
     if (await TokenStorage.getAccessToken() != null) {
       var user = await _api.getUser();
+      var token = await FirebaseMessaging.instance.getToken();
 
       if (user != null) {
+        if (token != null) {
+          await _api.subscribe(PushToken(token: token));
+        }
+
         await SharedPrefs.setStoredUser(user);
         await _dataService.createUpdateUser(user);
       }
@@ -52,12 +59,18 @@ class AuthService {
     return res;
   }
 
-  Future logOut() async {
+  Future cleanToken() async {
     await TokenStorage.setStoredToken(null);
   }
 
-  Future createAccount(CreateAccount model) async =>
-      await _api.createAccount(model: model);
+  Future logOut() async {
+    await _api.unsubscribe();
+
+    await cleanToken();
+  }
+
+  Future createProfile(CreateProfile model) async =>
+      await _api.createProfile(model: model);
 }
 
 class NoNetworkException implements Exception {}

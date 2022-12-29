@@ -44,7 +44,7 @@ class ApiModule {
           }
         } catch (e) {
           var service = AuthService();
-          await service.logOut();
+          await service.cleanToken();
           AppNavigator.toLoader();
           return handler
               .resolve(Response(statusCode: 400, requestOptions: options));

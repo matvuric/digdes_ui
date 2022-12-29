@@ -3,10 +3,11 @@ import 'dart:io';
 import 'package:digdes_ui/data/clients/api_client.dart';
 import 'package:digdes_ui/data/clients/auth_client.dart';
 import 'package:digdes_ui/domain/models/attachment_meta.dart';
-import 'package:digdes_ui/domain/models/create_account.dart';
+import 'package:digdes_ui/domain/models/create_profile.dart';
 import 'package:digdes_ui/domain/models/create_post.dart';
 import 'package:digdes_ui/domain/models/edit_profile.dart';
 import 'package:digdes_ui/domain/models/post_model.dart';
+import 'package:digdes_ui/domain/models/push_token.dart';
 import 'package:digdes_ui/domain/models/refresh_token_request.dart';
 import 'package:digdes_ui/domain/models/token_request.dart';
 import 'package:digdes_ui/domain/models/token_response.dart';
@@ -31,8 +32,8 @@ class ApiDataRepository extends ApiRepository {
   }
 
   @override
-  Future createAccount({required CreateAccount model}) async =>
-      await _auth.createAccount(model);
+  Future createProfile({required CreateProfile model}) async =>
+      await _auth.createProfile(model);
 
   @override
   Future editProfile({required EditProfile model}) async =>
@@ -54,4 +55,10 @@ class ApiDataRepository extends ApiRepository {
 
   @override
   Future createPost(CreatePost model) async => await _api.createPost(model);
+
+  @override
+  Future subscribe(PushToken model) async => await _api.subscribe(model);
+
+  @override
+  Future unsubscribe() async => await _api.unsubscribe();
 }

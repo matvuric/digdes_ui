@@ -46,7 +46,7 @@ class Auth extends StatelessWidget {
                 alignment: Alignment.bottomCenter,
                 child: TextButton(
                     onPressed: viewModel.toSignUp,
-                    child: const Text("Create new account")),
+                    child: const Text("Create new profile")),
               ),
             ]),
           ),
