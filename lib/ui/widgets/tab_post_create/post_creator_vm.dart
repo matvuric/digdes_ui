@@ -77,14 +77,21 @@ class PostCreatorViewModel extends ChangeNotifier {
     }
   }
 
-  void onPageChanged(int pageIndex) {
-    pager = pageIndex;
-    notifyListeners();
-  }
-
   void confirm() async {
     post?.caption = caption.text;
     post?.postAttachments = metaList;
     await apiService.createPost(post!);
+  }
+
+  bool checkFields() {
+    if (metaList.isNotEmpty || caption.text != post!.caption) {
+      return true;
+    }
+    return false;
+  }
+
+  void onPageChanged(int pageIndex) {
+    pager = pageIndex;
+    notifyListeners();
   }
 }

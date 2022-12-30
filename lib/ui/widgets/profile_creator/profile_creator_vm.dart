@@ -46,7 +46,7 @@ class ProfileCreatorViewModel extends ChangeNotifier {
       gender: '',
       password: '',
       phone: '',
-      birthDate: DateTime.now(),
+      birthDate: DateTime(0),
       email: '',
       isPrivate: false,
       retryPassword: '',
@@ -63,6 +63,14 @@ class ProfileCreatorViewModel extends ChangeNotifier {
     user?.email = email.text;
     user?.retryPassword = retryPassword.text;
 
+    if (img != null) {
+      var t = await apiService.uploadTemp([img!]);
+
+      if (t.isNotEmpty) {
+        user?.image = t.first;
+      }
+    }
+
     await authService.createProfile(user!);
   }
 
@@ -72,14 +80,22 @@ class ProfileCreatorViewModel extends ChangeNotifier {
     if (pickedImg != null) {
       final imgTemp = File(pickedImg.path);
       img = imgTemp;
-
-      if (img != null) {
-        var t = await apiService.uploadTemp([img!]);
-
-        if (t.isNotEmpty) {
-          user?.image = t.first;
-        }
-      }
     }
+  }
+
+  bool checkFields() {
+    if (user!.username != username.text ||
+        user!.firstName != firstName.text ||
+        user!.lastName != lastName.text ||
+        user!.bio != bio.text ||
+        user!.gender != '' ||
+        user!.phone != phone.text ||
+        user!.email != email.text ||
+        user!.birthDate != DateTime(0) ||
+        user!.isPrivate != false ||
+        img != null) {
+      return true;
+    }
+    return false;
   }
 }

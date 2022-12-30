@@ -19,208 +19,219 @@ class ProfileEditor extends StatelessWidget {
         type: MaskAutoCompletionType.lazy);
     bool shouldPop = false;
 
-    return WillPopScope(
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          appBar: AppBar(
-            title: const Text("Edit Profile"),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  viewModel.confirm();
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(Icons.done),
+    return GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: WillPopScope(
+            onWillPop: () async {
+              if (viewModel.checkFields()) {
+                await showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                          title: const Text(
+                              'If you continue your changes will not be saved.'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                viewModel.asyncInit();
+                                Navigator.of(context).pop();
+                                shouldPop = true;
+                              },
+                              child: const Text('Continue',
+                                  selectionColor: Colors.grey),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                shouldPop = false;
+                              },
+                              child: const Text('Cancel'),
+                            ),
+                          ],
+                        ));
+              } else {
+                return true;
+              }
+              return shouldPop;
+            },
+            child: Scaffold(
+              resizeToAvoidBottomInset: true,
+              appBar: AppBar(
+                title: const Text("Edit Profile"),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      viewModel.confirm();
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(Icons.done),
+                  ),
+                ],
               ),
-            ],
-          ),
-          body: (viewModel.user != null)
-              ? SingleChildScrollView(
-                  child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Material(
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          shape: const CircleBorder(),
-                          child: InkWell(
-                            onTap: () => showDialog<String>(
-                              context: context,
-                              builder: (BuildContext context) => AlertDialog(
-                                title: const Text(
-                                    'How do you want to choose photo?'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () {
-                                      viewModel.pickImage(ImageSource.gallery);
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('From Gallery'),
+              body: (viewModel.user != null)
+                  ? SingleChildScrollView(
+                      child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Material(
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              shape: const CircleBorder(),
+                              child: InkWell(
+                                onTap: () => showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      AlertDialog(
+                                    title: const Text(
+                                        'How do you want to choose photo?'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () {
+                                          viewModel
+                                              .pickImage(ImageSource.gallery);
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('From Gallery'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          viewModel
+                                              .pickImage(ImageSource.camera);
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('By Camera'),
+                                      ),
+                                    ],
                                   ),
-                                  TextButton(
-                                    onPressed: () {
-                                      viewModel.pickImage(ImageSource.camera);
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('By Camera'),
-                                  ),
-                                ],
+                                ),
+                                child: Ink.image(
+                                  image: viewModel.avatar != null
+                                      ? viewModel.avatar!.image
+                                      : const AssetImage(
+                                          "assets/images/noavatar.png"),
+                                  height: 100,
+                                  width: 100,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                            child: Ink.image(
-                              image: viewModel.avatar != null
-                                  ? viewModel.avatar!.image
-                                  : const AssetImage(
-                                      "assets/images/noavatar.png"),
-                              height: 100,
-                              width: 100,
-                              fit: BoxFit.cover,
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                const Expanded(
+                                    flex: 1, child: Text("Username")),
+                                Expanded(
+                                  flex: 2,
+                                  child: TextField(
+                                      controller: viewModel.username,
+                                      decoration: const InputDecoration(
+                                        hintText: 'Enter your username',
+                                      )),
+                                )
+                              ],
                             ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            const Expanded(flex: 1, child: Text("Username")),
-                            Expanded(
-                              flex: 2,
-                              child: TextField(
-                                  controller: viewModel.username,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Enter your username',
-                                  )),
-                            )
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const Expanded(flex: 1, child: Text("First Name")),
-                            Expanded(
-                              flex: 2,
-                              child: TextField(
-                                  controller: viewModel.firstName,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Enter your first name',
-                                  )),
-                            )
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const Expanded(flex: 1, child: Text("Last Name")),
-                            Expanded(
-                              flex: 2,
-                              child: TextField(
-                                  controller: viewModel.lastName,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Enter your last name',
-                                  )),
-                            )
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const Expanded(flex: 1, child: Text("Bio")),
-                            Expanded(
-                              flex: 2,
-                              child: TextField(
-                                  controller: viewModel.bio,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Enter bio',
-                                  )),
-                            )
-                          ],
-                        ),
-                        Row(
-                          children: const [
-                            Expanded(flex: 1, child: Text("Gender")),
-                            Expanded(flex: 2, child: DropdownButtonGender())
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const Expanded(flex: 1, child: Text("Phone")),
-                            Expanded(
-                              flex: 2,
-                              child: TextField(
-                                  controller: viewModel.phone,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: [maskFormatter],
-                                  decoration: const InputDecoration(
-                                    hintText: 'Enter your phone number',
-                                  )),
-                            )
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const Expanded(flex: 1, child: Text("Email")),
-                            Expanded(
-                              flex: 2,
-                              child: TextField(
-                                  controller: viewModel.email,
-                                  keyboardType: TextInputType.emailAddress,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Enter your email',
-                                  )),
-                            )
-                          ],
-                        ),
-                        Row(
-                          children: const [
-                            Expanded(flex: 1, child: Text("Birth Date")),
-                            Expanded(
-                              flex: 2,
-                              child: DatePicker(),
-                            )
-                          ],
-                        ),
-                        Row(
-                          children: const [
-                            Expanded(flex: 1, child: Text("Private profile")),
-                            Expanded(
-                              flex: 2,
-                              child: Switcher(),
-                            )
-                          ],
-                        ),
-                      ]),
-                ))
-              : null,
-        ),
-        onWillPop: () async {
-          if (viewModel.checkFields()) {
-            await showDialog<String>(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                      title: const Text(
-                          'If you continue your changes will not be saved.'),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            viewModel.asyncInit();
-                            Navigator.of(context).pop();
-                            shouldPop = true;
-                          },
-                          child: const Text('Continue',
-                              selectionColor: Colors.grey),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            shouldPop = false;
-                          },
-                          child: const Text('Cancel'),
-                        ),
-                      ],
-                    ));
-          } else {
-            return true;
-          }
-          return shouldPop;
-        });
+                            Row(
+                              children: [
+                                const Expanded(
+                                    flex: 1, child: Text("First Name")),
+                                Expanded(
+                                  flex: 2,
+                                  child: TextField(
+                                      controller: viewModel.firstName,
+                                      decoration: const InputDecoration(
+                                        hintText: 'Enter your first name',
+                                      )),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Expanded(
+                                    flex: 1, child: Text("Last Name")),
+                                Expanded(
+                                  flex: 2,
+                                  child: TextField(
+                                      controller: viewModel.lastName,
+                                      decoration: const InputDecoration(
+                                        hintText: 'Enter your last name',
+                                      )),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Expanded(flex: 1, child: Text("Bio")),
+                                Expanded(
+                                  flex: 2,
+                                  child: TextField(
+                                      controller: viewModel.bio,
+                                      decoration: const InputDecoration(
+                                        hintText: 'Enter bio',
+                                      )),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: const [
+                                Expanded(flex: 1, child: Text("Gender")),
+                                Expanded(flex: 2, child: DropdownButtonGender())
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Expanded(flex: 1, child: Text("Phone")),
+                                Expanded(
+                                  flex: 2,
+                                  child: TextField(
+                                      controller: viewModel.phone,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [maskFormatter],
+                                      decoration: const InputDecoration(
+                                        hintText: 'Enter your phone number',
+                                      )),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Expanded(flex: 1, child: Text("Email")),
+                                Expanded(
+                                  flex: 2,
+                                  child: TextField(
+                                      controller: viewModel.email,
+                                      keyboardType: TextInputType.emailAddress,
+                                      decoration: const InputDecoration(
+                                        hintText: 'Enter your email',
+                                      )),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: const [
+                                Expanded(flex: 1, child: Text("Birth Date")),
+                                Expanded(
+                                  flex: 2,
+                                  child: DatePicker(),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: const [
+                                Expanded(
+                                    flex: 1, child: Text("Private profile")),
+                                Expanded(
+                                  flex: 2,
+                                  child: Switcher(),
+                                )
+                              ],
+                            ),
+                          ]),
+                    ))
+                  : null,
+            )));
   }
 
   static Widget create(BuildContext bc) {

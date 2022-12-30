@@ -118,7 +118,8 @@ class ProfileEditorViewModel extends ChangeNotifier {
         user!.phone != phone.text ||
         user!.email != email.text ||
         user!.birthDate != profile!.birthDate ||
-        user!.isPrivate != profile!.isPrivate) {
+        user!.isPrivate != profile!.isPrivate ||
+        user!.avatarLink != null) {
       return true;
     }
     return false;
