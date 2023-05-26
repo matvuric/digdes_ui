@@ -53,10 +53,10 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCTSqZpxLzYoizmgLCS5f8xwtuoOEV6SWc',
-    appId: '1:385681437373:android:416bfd00303bff44187dd4',
-    messagingSenderId: '385681437373',
-    projectId: 'seismic-bonfire-354222',
-    storageBucket: 'seismic-bonfire-354222.appspot.com',
+    apiKey: ${{ secrets.API_KEY }},
+    appId: ${{ secrets.APP_ID }},
+    messagingSenderId: ${{ secrets.SENDER_ID }},
+    projectId: ${{ secrets.PROJECT_ID }},
+    storageBucket: ${{ secrets.STORAGE_BUCKET }},
   );
 }
