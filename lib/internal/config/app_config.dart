@@ -1,2 +1,2 @@
-String baseUrl = "http://192.168.0.25:5050/";
-String baseUrl2 = "http://192.168.0.25:5050";
+String baseUrl = ${{ secrets.BASE_URL }};
+String baseUrl2 = ${{ secrets.BASE_URL_2 }};
